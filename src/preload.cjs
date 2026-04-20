@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer } = require('electron')
+const { contextBridge, ipcRenderer, shell } = require('electron')
 const fs   = require('fs')
 const path = require('path')
 
@@ -11,6 +11,9 @@ contextBridge.exposeInMainWorld('pet', {
   },
   showContextMenu: () => {
     ipcRenderer.send('pet:show-context-menu')
+  },
+  openClaude: () => {
+    ipcRenderer.send('pet:open-claude')
   },
 
   // SVG 파일을 문자열로 반환 (fetch 대신 Node.js fs 사용)

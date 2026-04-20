@@ -221,14 +221,19 @@
     console.warn('[renderer] window.pet 없음 — preload 미연결')
   }
 
-  // ── 우클릭 컨텍스트 메뉴 (hit-area 전체 감지) ───────────────
+  // ── 우클릭 컨텍스트 메뉴 / 좌클릭 Claude 열기 ──────────────
 
-  document.getElementById('hit-area').addEventListener('contextmenu', e => {
+  const hitArea = document.getElementById('hit-area')
+
+  hitArea.addEventListener('contextmenu', e => {
     e.preventDefault()
     window.pet?.showContextMenu()
   })
-  // hit-area가 드래그를 막으므로, 좌클릭 드래그는 별도 IPC 없이 Electron이 처리
-  // (추후 드래그 기능 추가 시 mousedown → ipcRenderer.send('start-drag') 방식 사용)
+
+  hitArea.addEventListener('click', e => {
+    e.preventDefault()
+    window.pet?.openClaude()
+  })
 
   // ── 초기화 ──────────────────────────────────────────────────
 

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, screen, Menu } from 'electron'
+import { app, BrowserWindow, ipcMain, screen, Menu, shell } from 'electron'
 import { createServer } from './server.js'
 import { loadPrefs, savePrefs } from './prefs.js'
 import path from 'path'
@@ -20,11 +20,14 @@ app.on('window-all-closed', () => {
 })
 
 function createPetWindow() {
-  const { width: sw, height: sh } = screen.getPrimaryDisplay().workAreaSize
+  const { width: sw } = screen.getPrimaryDisplay().workAreaSize
+  const { height: fh } = screen.getPrimaryDisplay().bounds  // 독 포함 전체 화면 높이
 
-  // 저장된 위치 사용, 없으면 우측 하단 기본값
-  const x = prefs.windowX ?? sw - 160
-  const y = prefs.windowY ?? sh - 160
+  // 저장된 위치 사용, 없으면 좌측 하단 기본값 (독 바로 위)
+  const x = prefs.windowX ?? 20
+  const y = prefs.windowY ?? fh - 140
+
+  console.log(`[main] 화면 크기: ${sw}x${fh}, 창 위치: ${x},${y}`)
 
   const win = new BrowserWindow({
     width: 140,
@@ -69,4 +72,11 @@ ipcMain.on('pet:show-context-menu', (event) => {
     { label: '종료', click: () => app.quit() },
   ])
   menu.popup({ window: win })
+})
+
+// 좌클릭 → Claude 앱 또는 claude.ai 열기
+ipcMain.on('pet:open-claude', () => {
+  shell.openPath('/Applications/Claude.app').then(err => {
+    if (err) shell.openExternal('https://claude.ai')
+  })
 })
