@@ -78,10 +78,34 @@ const EVENT_STATE_MAP = {
   SessionEnd:          'idle',
 }
 
+// 권한 대기 감지: PreToolUse 후 PostToolUse가 일정 시간 내에 안 오면 알림
+const PERMISSION_WAIT_MS = 2000
+let permissionTimer = null
+
+function sendState(mainWindow, state, event, sessionId) {
+  mainWindow?.webContents.send('pet:state-changed', { state, event, sessionId })
+}
+
 function handleStateEvent(payload, mainWindow) {
   const { event, sessionId, cwd } = payload
 
   console.log(`[server] event=${event} session=${sessionId ?? '-'} cwd=${cwd ?? '-'}`)
+
+  // 권한 대기 감지 로직
+  if (event === 'PreToolUse') {
+    // PostToolUse 가 PERMISSION_WAIT_MS 내에 안 오면 권한 대기 중으로 판단
+    clearTimeout(permissionTimer)
+    permissionTimer = setTimeout(() => {
+      console.log('[server] 권한 대기 중으로 판단 → notification')
+      sendState(mainWindow, 'notification', 'PermissionWait', sessionId)
+    }, PERMISSION_WAIT_MS)
+  }
+
+  if (event === 'PostToolUse' || event === 'PostToolUseFailure' || event === 'Stop') {
+    // 도구 완료 또는 세션 종료 → 권한 타이머 해제
+    clearTimeout(permissionTimer)
+    permissionTimer = null
+  }
 
   const targetState = EVENT_STATE_MAP[event]
   if (targetState === undefined) {
@@ -90,10 +114,5 @@ function handleStateEvent(payload, mainWindow) {
   }
   if (targetState === null) return  // SessionStart 등 상태 변경 없는 이벤트
 
-  // 상태 머신은 렌더러(state.js)에서 관리 — IPC로 전달
-  mainWindow?.webContents.send('pet:state-changed', {
-    state: targetState,
-    event,
-    sessionId,
-  })
+  sendState(mainWindow, targetState, event, sessionId)
 }
