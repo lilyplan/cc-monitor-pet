@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" shape-rendering="crispEdges">
+  <g id="root">
+    <!-- Body -->
+    <rect x="28" y="44" width="64" height="28" fill="#CC7850"/>
+    <!-- Left arm bump (spread out) -->
+    <rect x="16" y="52" width="8" height="14" fill="#CC7850"/>
+    <!-- Right arm bump (spread out) -->
+    <rect x="96" y="52" width="8" height="14" fill="#CC7850"/>
+    <!-- Left eye (narrower height=8) -->
+    <rect x="38" y="52" width="12" height="8" fill="#1A0A00"/>
+    <!-- Right eye (narrower height=8) -->
+    <rect x="70" y="52" width="12" height="8" fill="#1A0A00"/>
+    <!-- Open mouth -->
+    <rect x="44" y="62" width="32" height="10" fill="#1A0A00"/>
+    <!-- Legs -->
+    <rect x="36" y="72" width="10" height="12" fill="#CC7850"/>
+    <rect x="50" y="72" width="10" height="12" fill="#CC7850"/>
+    <rect x="60" y="72" width="10" height="12" fill="#CC7850"/>
+    <rect x="74" y="72" width="10" height="12" fill="#CC7850"/>
+  </g>
+</svg>

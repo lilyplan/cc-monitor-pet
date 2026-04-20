@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "name": "CC",
+  "viewBox": "0 0 120 120",
+  "eyeTracking": {
+    "followFile": "idle-follow.svg",
+    "pupilLeftId": "pupil-left",
+    "pupilRightId": "pupil-right",
+    "shineLeftId": "shine-left",
+    "shineRightId": "shine-right",
+    "defaultLeft":  { "cx": 54, "cy": 58 },
+    "defaultRight": { "cx": 70, "cy": 58 },
+    "maxOffset": 3
+  },
+  "states": {
+    "idle":         { "file": "idle.svg",         "oneShot": false },
+    "thinking":     { "file": "thinking.svg",     "oneShot": false },
+    "working":      { "file": "working.svg",      "oneShot": false },
+    "juggling":     { "file": "juggling.svg",     "oneShot": false },
+    "carrying":     { "file": "carrying.svg",     "oneShot": false },
+    "attention":    { "file": "attention.svg",    "oneShot": true  },
+    "sweeping":     { "file": "sweeping.svg",     "oneShot": false },
+    "notification": { "file": "notification.svg", "oneShot": true  },
+    "error":        { "file": "error.svg",        "oneShot": true  },
+    "yawning":      { "file": "yawning.svg",      "oneShot": false },
+    "dozing":       { "file": "dozing.svg",       "oneShot": false },
+    "collapsing":   { "file": "collapsing.svg",   "oneShot": false },
+    "sleeping":     { "file": "sleeping.svg",     "oneShot": false },
+    "waking":       { "file": "waking.svg",       "oneShot": false }
+  },
+  "sleepSequence": ["yawning", "dozing", "collapsing", "sleeping"],
+  "wakeSequence":  ["waking"]
+}

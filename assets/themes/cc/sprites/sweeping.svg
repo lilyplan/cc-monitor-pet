@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" shape-rendering="crispEdges">
+  <g id="root" transform="rotate(-12,60,70)">
+    <!-- Body -->
+    <rect x="28" y="44" width="64" height="28" fill="#CC7850"/>
+    <!-- Left arm bump -->
+    <rect x="20" y="52" width="8" height="14" fill="#CC7850"/>
+    <!-- Right arm bump -->
+    <rect x="92" y="52" width="8" height="14" fill="#CC7850"/>
+    <!-- Left eye -->
+    <rect x="38" y="52" width="12" height="12" fill="#1A0A00"/>
+    <!-- Right eye -->
+    <rect x="70" y="52" width="12" height="12" fill="#1A0A00"/>
+    <!-- Legs -->
+    <rect x="36" y="72" width="10" height="12" fill="#CC7850"/>
+    <rect x="50" y="72" width="10" height="12" fill="#CC7850"/>
+    <rect x="60" y="72" width="10" height="12" fill="#CC7850"/>
+    <rect x="74" y="72" width="10" height="12" fill="#CC7850"/>
+    <!-- Broom handle -->
+    <rect x="10" y="48" width="6" height="50" fill="#A07840"/>
+    <!-- Broom head -->
+    <rect x="4" y="94" width="30" height="8" fill="#C8A060"/>
+  </g>
+</svg>

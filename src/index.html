@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'self';" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 140px;
+      height: 140px;
+      background: transparent;
+      overflow: hidden;
+      user-select: none;
+      -webkit-app-region: drag;
+    }
+
+    #pet-container {
+      width: 140px;
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* 채널 A: 아이 트래킹 전용 */
+    #ch-follow {
+      width: 120px;
+      height: 120px;
+      position: absolute;
+      display: none;
+      border: none;
+      background: transparent;
+    }
+
+    /* 채널 B: 일반 SVG innerHTML */
+    #ch-sprite {
+      width: 120px;
+      height: 120px;
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #ch-sprite svg { width: 120px; height: 120px; }
+
+    /* 투명 우클릭 오버레이 — 전체 140x140 커버, 드래그 허용 */
+    #hit-area {
+      position: absolute;
+      inset: 0;
+      width: 140px;
+      height: 140px;
+      background: transparent;
+      -webkit-app-region: no-drag;
+      z-index: 100;
+      cursor: default;
+    }
+  </style>
+</head>
+<body>
+  <div id="pet-container">
+    <object id="ch-follow" type="image/svg+xml" data=""></object>
+    <div id="ch-sprite"></div>
+
+    <!-- 전체 영역 우클릭 감지용 투명 오버레이 -->
+    <div id="hit-area"></div>
+  </div>
+  <script src="renderer.js"></script>
+</body>
+</html>

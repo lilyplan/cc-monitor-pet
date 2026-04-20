@@ -1,0 +1,36 @@
+{
+  "name": "cc-desk-pet",
+  "version": "0.1.0",
+  "description": "CC desktop pet — visualizes Claude Code agent activity",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "install-hooks": "node hooks/install.js"
+  },
+  "build": {
+    "appId": "com.cc-desk-pet.app",
+    "productName": "CC Desk Pet",
+    "directories": {
+      "output": "dist"
+    },
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.utilities"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "hooks/**/*",
+      "node_modules/**/*"
+    ]
+  },
+  "keywords": ["claude", "claude-code", "desktop-pet", "electron"],
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  }
+}
