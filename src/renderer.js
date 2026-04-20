@@ -168,15 +168,18 @@
     showSprite(svg)
     console.log(`[renderer] sprite → ${state}`)
 
-    // ONE_SHOT 상태는 3초 후 자동으로 idle 복귀
+    // ONE_SHOT 상태 자동 idle 복귀
+    // notification: 점프 3초 + 대기 20초 = 23초 후 복귀
+    // 그 외: 3초 후 복귀
     if (ONE_SHOT.has(state)) {
+      const delay = state === 'notification' ? 23000 : 3000
       oneShotTimer = setTimeout(() => {
         if (ONE_SHOT.has(currentState)) {
           activeStates = {}
           doTransition('idle')
           resetIdleTimers()
         }
-      }, 3000)
+      }, delay)
     }
   }
 

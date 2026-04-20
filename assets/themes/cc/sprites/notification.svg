@@ -1,10 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" shape-rendering="crispEdges">
   <g id="root">
     <!-- 전체 캐릭터 점프 애니메이션 -->
+    <!-- 3초(5회) 점프 후 정지 -->
     <animateTransform attributeName="transform" type="translate"
       values="0,0; 0,-14; 0,-16; 0,-10; 0,-14; 0,0"
       keyTimes="0; 0.2; 0.35; 0.5; 0.65; 1"
-      dur="0.6s" repeatCount="indefinite"/>
+      dur="0.6s" repeatCount="5" fill="freeze"/>
 
     <!-- ! 마크 -->
     <rect x="57" y="4" width="6" height="16" fill="#FF8800"/>
