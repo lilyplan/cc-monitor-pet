@@ -122,6 +122,15 @@ cc-monitor-pet/
 
 [rullerzhou-afk/clawd-on-desk](https://github.com/rullerzhou-afk/clawd-on-desk) 프로젝트에서 아이디어를 얻어 새로 제작했습니다.
 
+## Disclaimer
+
+The Claude character is the property of Anthropic. This is an unofficial fan project and is not affiliated with, endorsed by, or approved by Anthropic.
+
+The artwork in `assets/` is **not** covered by the MIT License. All rights belong to their respective copyright holders. See `assets/LICENSE` for details.
+
+Third-party content: copyright belongs to the respective artists.
+
 ## License
 
-MIT
+The source code in this repository is licensed under the MIT License.  
+The artwork in `assets/` is excluded from this license. See the Disclaimer above.
