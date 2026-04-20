@@ -71,7 +71,7 @@ const EVENT_STATE_MAP = {
   SubagentStop:        'working',
   PreCompact:          'sweeping',
   PostCompact:         'attention',
-  Stop:                'idle',
+  Stop:                'notification',
   StopFailure:         'error',
   Notification:        'notification',
   SessionStart:        null,   // 세션 등록만, 상태 변경 없음

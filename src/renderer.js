@@ -19,7 +19,7 @@
 
   let currentState = 'idle'
   let activeStates = {}
-  let idleTimer = null, sleepTimer = null, wakeTimer = null
+  let idleTimer = null, sleepTimer = null, wakeTimer = null, oneShotTimer = null
 
   function requestState(state) {
     if (!(state in PRIORITY)) return
@@ -157,6 +157,8 @@
   // ── 스프라이트 설정 ──────────────────────────────────────────
 
   function setSprite(state) {
+    clearTimeout(oneShotTimer)
+
     if (state === 'idle') {
       showFollow()
       return
@@ -165,6 +167,17 @@
     const svg = SPRITES[state] ?? SPRITES['idle']
     showSprite(svg)
     console.log(`[renderer] sprite → ${state}`)
+
+    // ONE_SHOT 상태는 3초 후 자동으로 idle 복귀
+    if (ONE_SHOT.has(state)) {
+      oneShotTimer = setTimeout(() => {
+        if (ONE_SHOT.has(currentState)) {
+          activeStates = {}
+          doTransition('idle')
+          resetIdleTimers()
+        }
+      }, 3000)
+    }
   }
 
   // ── 수면 시퀀스 ──────────────────────────────────────────────
@@ -192,8 +205,8 @@
   if (window.pet) {
     window.pet.onStateChanged(({ state, event }) => {
       console.log(`[renderer] event=${event} → state=${state}`)
-      if (event === 'Stop' || event === 'SessionEnd') {
-        // 쌓인 카운트 전부 초기화 후 idle로
+      if (event === 'SessionEnd') {
+        // 세션 종료 → 즉시 idle
         activeStates = {}
         doTransition('idle')
         resetIdleTimers()
