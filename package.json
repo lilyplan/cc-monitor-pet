@@ -1,7 +1,7 @@
 {
-  "name": "cc-desk-pet",
+  "name": "cc-monitor-pet",
   "version": "0.1.0",
-  "description": "CC desktop pet — visualizes Claude Code agent activity",
+  "description": "CC monitor pet — visualizes Claude Code agent activity",
   "main": "src/main.js",
   "type": "module",
   "scripts": {
@@ -11,8 +11,8 @@
     "install-hooks": "node hooks/install.js"
   },
   "build": {
-    "appId": "com.cc-desk-pet.app",
-    "productName": "CC Desk Pet",
+    "appId": "com.cc-monitor-pet.app",
+    "productName": "CC Monitor Pet",
     "directories": {
       "output": "dist"
     },
