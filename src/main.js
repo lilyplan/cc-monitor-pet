@@ -23,9 +23,9 @@ function createPetWindow() {
   const { width: sw } = screen.getPrimaryDisplay().workAreaSize
   const { height: fh } = screen.getPrimaryDisplay().bounds  // 독 포함 전체 화면 높이
 
-  // 저장된 위치 사용, 없으면 좌측 하단 기본값 (독 바로 위)
+  // X만 저장 위치 사용, Y는 항상 현재 화면 최하단에 고정
   const x = prefs.windowX ?? 20
-  const y = prefs.windowY ?? fh - 140
+  const y = fh - 170
 
   console.log(`[main] 화면 크기: ${sw}x${fh}, 창 위치: ${x},${y}`)
 
@@ -40,6 +40,7 @@ function createPetWindow() {
     resizable: false,
     skipTaskbar: true,
     hasShadow: false,
+    show: false,   // 렌더 완료 후 표시 (흰 배경 방지)
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
       contextIsolation: true,
@@ -51,10 +52,15 @@ function createPetWindow() {
   win.setAlwaysOnTop(true, 'screen-saver')
   win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
 
-  // 창 이동 시 위치 저장
+  // 렌더링 완료 후 투명하게 표시
+  win.once('ready-to-show', () => {
+    win.show()
+  })
+
+  // X 위치만 저장 (Y는 항상 화면 최하단 고정)
   win.on('moved', () => {
-    const [wx, wy] = win.getPosition()
-    savePrefs({ ...loadPrefs(), windowX: wx, windowY: wy })
+    const [wx] = win.getPosition()
+    savePrefs({ ...loadPrefs(), windowX: wx })
   })
 
   return win

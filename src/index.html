@@ -5,12 +5,12 @@
   <meta http-equiv="Content-Security-Policy"
     content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'self';" />
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; background: transparent; }
 
     html, body {
       width: 140px;
       height: 140px;
-      background: transparent;
+      background: transparent !important;
       overflow: hidden;
       user-select: none;
       -webkit-app-region: drag;
@@ -20,7 +20,7 @@
       width: 140px;
       height: 140px;
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       justify-content: center;
       position: relative;
     }
@@ -30,6 +30,7 @@
       width: 120px;
       height: 120px;
       position: absolute;
+      bottom: 0;
       display: none;
       border: none;
       background: transparent;
@@ -40,8 +41,9 @@
       width: 120px;
       height: 120px;
       position: absolute;
+      bottom: 0;
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       justify-content: center;
     }
     #ch-sprite svg { width: 120px; height: 120px; }
