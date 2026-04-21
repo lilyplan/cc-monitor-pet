@@ -75,6 +75,34 @@ npm install
 npm start
 ```
 
+## 로그인 시 자동 실행 (macOS)
+
+Mac을 켤 때 펫이 자동으로 실행되도록 설정합니다.
+
+**1. 런처 앱 생성**
+
+```bash
+mkdir -p ~/Applications
+osacompile -o ~/Applications/CCMonitorPet.app \
+  -e 'do shell script "/usr/local/bin/npm --prefix /YOUR/PATH/cc-monitor-pet start > /tmp/cc-monitor-pet.log 2>&1 &"'
+```
+
+> `/YOUR/PATH/cc-monitor-pet`을 실제 프로젝트 경로로 변경하세요.
+
+**2. 로그인 항목 등록**
+
+```bash
+osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Users/YOUR_NAME/Applications/CCMonitorPet.app", hidden:true}'
+```
+
+또는 **시스템 설정 → 일반 → 로그인 항목**에서 `CCMonitorPet.app`을 직접 추가할 수 있습니다.
+
+**자동 실행 해제**
+
+```bash
+osascript -e 'tell application "System Events" to delete login item "CCMonitorPet"'
+```
+
 ## Claude Code 훅 연결
 
 앱 실행 후 아래 명령어로 Claude Code 훅을 등록합니다.
