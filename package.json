@@ -8,7 +8,8 @@
     "start": "electron .",
     "build": "electron-builder",
     "build:mac": "electron-builder --mac",
-    "install-hooks": "node hooks/install.js"
+    "install-hooks": "node hooks/install.js",
+    "mcp": "node mcp/pet-server.js"
   },
   "build": {
     "appId": "com.cc-monitor-pet.app",
@@ -27,10 +28,18 @@
       "node_modules/**/*"
     ]
   },
-  "keywords": ["claude", "claude-code", "desktop-pet", "electron"],
+  "keywords": [
+    "claude",
+    "claude-code",
+    "desktop-pet",
+    "electron"
+  ],
   "license": "MIT",
   "devDependencies": {
     "electron": "^33.0.0",
     "electron-builder": "^25.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0"
   }
 }
