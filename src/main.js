@@ -25,7 +25,7 @@ function createPetWindow() {
 
   // X만 저장 위치 사용, Y는 항상 현재 화면 최하단에 고정
   const x = prefs.windowX ?? 20
-  const y = fh - 170
+  const y = fh - 130
 
   console.log(`[main] 화면 크기: ${sw}x${fh}, 창 위치: ${x},${y}`)
 

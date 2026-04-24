@@ -3,7 +3,7 @@
 Claude Code의 AI 에이전트 활동을 시각화하는 macOS 데스크탑 펫.  
 Claude Code가 작업할 때 화면 위 픽셀아트 캐릭터가 실시간으로 반응합니다.
 
-![idle](assets/themes/cc/sprites/idle.svg) ![working](assets/themes/cc/sprites/working.svg) ![notification](assets/themes/cc/sprites/notification.svg) ![sleeping](assets/themes/cc/sprites/sleeping.svg)
+<img src="assets/themes/cc/sprites/idle.svg" width="60"> <img src="assets/themes/cc/sprites/working.svg" width="60"> <img src="assets/themes/cc/sprites/notification.svg" width="60"> <img src="assets/themes/cc/sprites/sleeping.svg" width="60">
 
 ## 화면 예시
 
