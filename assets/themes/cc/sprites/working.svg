@@ -1,47 +1,69 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" shape-rendering="crispEdges">
-  <g id="root">
-    <!-- Code editor window dark bg -->
-    <rect x="24" y="6" width="72" height="34" fill="#1E1E2E"/>
-    <!-- Title bar -->
-    <rect x="24" y="6" width="72" height="8" fill="#333333"/>
-    <!-- Title bar dots -->
-    <rect x="28" y="8" width="4" height="4" fill="#FF5F56"/>
-    <rect x="34" y="8" width="4" height="4" fill="#FFBD2E"/>
-    <rect x="40" y="8" width="4" height="4" fill="#27C93F"/>
-    <!-- Code lines -->
-    <rect x="28" y="18" width="36" height="3" fill="#50FA7B"/>
-    <rect x="28" y="24" width="48" height="3" fill="#8BE9FD"/>
-    <rect x="28" y="30" width="28" height="3" fill="#F1FA8C"/>
-    <!-- Body -->
-    <rect x="28" y="44" width="64" height="28" fill="#CC7850"/>
-    <!-- Left arm bump -->
-    <rect x="20" y="52" width="8" height="14" fill="#CC7850"/>
-    <!-- Right arm bump -->
-    <rect x="92" y="52" width="8" height="14" fill="#CC7850"/>
-    <!-- Left eye -->
-    <rect x="38" y="52" width="12" height="12" fill="#1A0A00"/>
-    <!-- Right eye -->
-    <rect x="70" y="52" width="12" height="12" fill="#1A0A00"/>
-    <!-- Left pair legs (animated) -->
-    <g>
-      <animateTransform attributeName="transform" type="translate" values="0,0;0,-4;0,0" dur="0.35s" repeatCount="indefinite"/>
-      <rect x="36" y="72" width="10" height="12" fill="#CC7850"/>
-      <rect x="50" y="72" width="10" height="12" fill="#CC7850"/>
+<svg width="360" height="256" viewBox="0 0 360 256"
+  xmlns="http://www.w3.org/2000/svg" aria-label="Working">
+  <defs>
+    <filter id="fC" x="-15%" y="-15%" width="130%" height="130%"><feGaussianBlur stdDeviation="3"/></filter>
+    <filter id="fG" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="5"/></filter>
+    <filter id="fB" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="7"/></filter>
+    <filter id="fF" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="0.3"/></filter>
+    <filter id="fH" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.5"/></filter>
+  </defs>
+  <style>
+    .cloud{animation:float 3.8s ease-in-out infinite}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+    .el,.er{transform-box:fill-box;transform-origin:center;animation:blink 5.2s ease-in-out infinite}
+    @keyframes blink{0%,82%,100%{transform:scaleY(1)}88%{transform:scaleY(.06)}93%{transform:scaleY(1)}}
+    #htl{transform-box:fill-box;transform-origin:center bottom;animation:tapL .55s ease-in-out infinite}
+    #htr{transform-box:fill-box;transform-origin:center bottom;animation:tapR .55s ease-in-out infinite}
+    @keyframes tapL{0%,40%,100%{transform:translateY(0)}20%{transform:translateY(7px)}}
+    @keyframes tapR{0%,60%{transform:translateY(0)}80%{transform:translateY(7px)}100%{transform:translateY(0)}}
+  </style>
+  <g class="cloud">
+    <g filter="url(#fC)">
+      <ellipse cx="180" cy="178" rx="128" ry="43" fill="#FFBA80"/>
+      <circle cx="64"  cy="152" r="34" fill="#FFBA80"/>
+      <circle cx="122" cy="118" r="50" fill="#FFBA80"/>
+      <circle cx="173" cy="87"  r="56" fill="#FFBA80"/>
+      <circle cx="230" cy="111" r="53" fill="#FFCB98"/>
+      <circle cx="293" cy="148" r="37" fill="#FFCB98"/>
     </g>
-    <!-- Right pair legs (opposite phase) -->
-    <g>
-      <animateTransform attributeName="transform" type="translate" values="0,-4;0,0;0,-4" dur="0.35s" repeatCount="indefinite"/>
-      <rect x="60" y="72" width="10" height="12" fill="#CC7850"/>
-      <rect x="74" y="72" width="10" height="12" fill="#CC7850"/>
+    <g filter="url(#fG)">
+      <ellipse cx="165" cy="96" rx="44" ry="23" fill="#FFE8CC" opacity="0.52"/>
     </g>
-    <!-- Keyboard -->
-    <rect x="28" y="88" width="64" height="12" fill="#888888"/>
-    <rect x="30" y="90" width="8" height="4" fill="#AAAAAA"/>
-    <rect x="40" y="90" width="8" height="4" fill="#AAAAAA"/>
-    <rect x="50" y="90" width="8" height="4" fill="#AAAAAA"/>
-    <rect x="60" y="90" width="8" height="4" fill="#AAAAAA"/>
-    <rect x="70" y="90" width="8" height="4" fill="#AAAAAA"/>
-    <rect x="80" y="90" width="8" height="4" fill="#AAAAAA"/>
-    <rect x="34" y="95" width="52" height="3" fill="#AAAAAA"/>
+
+    <!-- Keyboard — dark body, white + mint keycaps -->
+    <rect x="108" y="224" width="144" height="28" rx="6" fill="#141824" stroke="#2A3248" stroke-width="1.5"/>
+    <!-- Row 1: white keys -->
+    <rect x="112" y="228" width="11" height="7" rx="2" fill="#FFFFFF" opacity="0.88"/>
+    <rect x="125" y="228" width="11" height="7" rx="2" fill="#FFFFFF" opacity="0.88"/>
+    <rect x="138" y="228" width="11" height="7" rx="2" fill="#FFFFFF" opacity="0.88"/>
+    <rect x="151" y="228" width="11" height="7" rx="2" fill="#FFFFFF" opacity="0.88"/>
+    <rect x="164" y="228" width="11" height="7" rx="2" fill="#FFFFFF" opacity="0.88"/>
+    <rect x="177" y="228" width="11" height="7" rx="2" fill="#FFFFFF" opacity="0.88"/>
+    <rect x="190" y="228" width="11" height="7" rx="2" fill="#FFFFFF" opacity="0.88"/>
+    <rect x="203" y="228" width="11" height="7" rx="2" fill="#FFFFFF" opacity="0.88"/>
+    <rect x="216" y="228" width="11" height="7" rx="2" fill="#FFFFFF" opacity="0.88"/>
+    <rect x="229" y="228" width="11" height="7" rx="2" fill="#FFFFFF" opacity="0.88"/>
+    <!-- Row 2: mint/lime green keys -->
+    <rect x="115" y="237" width="11" height="7" rx="2" fill="#B8F5A8" opacity="0.90"/>
+    <rect x="128" y="237" width="11" height="7" rx="2" fill="#B8F5A8" opacity="0.90"/>
+    <rect x="141" y="237" width="11" height="7" rx="2" fill="#B8F5A8" opacity="0.90"/>
+    <rect x="154" y="237" width="11" height="7" rx="2" fill="#B8F5A8" opacity="0.90"/>
+    <rect x="167" y="237" width="11" height="7" rx="2" fill="#B8F5A8" opacity="0.90"/>
+    <rect x="180" y="237" width="11" height="7" rx="2" fill="#B8F5A8" opacity="0.90"/>
+    <rect x="193" y="237" width="11" height="7" rx="2" fill="#B8F5A8" opacity="0.90"/>
+    <rect x="206" y="237" width="11" height="7" rx="2" fill="#B8F5A8" opacity="0.90"/>
+    <rect x="219" y="237" width="11" height="7" rx="2" fill="#B8F5A8" opacity="0.90"/>
+    <!-- Spacebar: white -->
+    <rect x="136" y="246" width="88" height="5" rx="2.5" fill="#FFFFFF" opacity="0.72"/>
+
+    <!-- Hands -->
+    <g id="htl" filter="url(#fH)"><circle cx="143" cy="214" r="18" fill="#FFD0A0"/></g>
+    <g id="htr" filter="url(#fH)"><circle cx="217" cy="214" r="18" fill="#FFD0A0"/></g>
+
+    <ellipse cx="136" cy="161" rx="24" ry="11" fill="#FF6080" opacity="0.32" filter="url(#fB)"/>
+    <ellipse cx="224" cy="161" rx="24" ry="11" fill="#FF6080" opacity="0.32" filter="url(#fB)"/>
+    <g class="el" filter="url(#fF)"><g><ellipse cx="150" cy="145" rx="14" ry="11" fill="#1E0A00"/><ellipse cx="146" cy="141" rx="4" ry="4" fill="#FFF" opacity="0.90"/></g></g>
+    <g class="er" filter="url(#fF)"><g><ellipse cx="210" cy="145" rx="14" ry="11" fill="#1E0A00"/><ellipse cx="206" cy="141" rx="4" ry="4" fill="#FFF" opacity="0.90"/></g></g>
+    <g filter="url(#fF)"><line x1="170" y1="171" x2="190" y2="171" stroke="#1E0A00" stroke-width="2.4" stroke-linecap="round"/></g>
   </g>
 </svg>

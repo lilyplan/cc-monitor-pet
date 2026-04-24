@@ -1,30 +1,46 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" shape-rendering="crispEdges">
-  <g id="root">
-    <animateTransform attributeName="transform" type="translate" values="-3,0;3,0;0,0" dur="0.3s" repeatCount="indefinite"/>
-    <!-- ERROR text above -->
-    <text x="22" y="26" font-size="14" fill="#CC2222" font-family="monospace" font-weight="bold">ERROR</text>
-    <!-- Body -->
-    <rect x="28" y="44" width="64" height="28" fill="#CC7850"/>
-    <!-- Left arm bump -->
-    <rect x="20" y="52" width="8" height="14" fill="#CC7850"/>
-    <!-- Right arm bump -->
-    <rect x="92" y="52" width="8" height="14" fill="#CC7850"/>
-    <!-- Left eye X (4 rects forming X) -->
-    <rect x="38" y="52" width="4" height="4" fill="#CC2222"/>
-    <rect x="46" y="52" width="4" height="4" fill="#CC2222"/>
-    <rect x="42" y="56" width="4" height="4" fill="#CC2222"/>
-    <rect x="38" y="60" width="4" height="4" fill="#CC2222"/>
-    <rect x="46" y="60" width="4" height="4" fill="#CC2222"/>
-    <!-- Right eye X (4 rects forming X) -->
-    <rect x="70" y="52" width="4" height="4" fill="#CC2222"/>
-    <rect x="78" y="52" width="4" height="4" fill="#CC2222"/>
-    <rect x="74" y="56" width="4" height="4" fill="#CC2222"/>
-    <rect x="70" y="60" width="4" height="4" fill="#CC2222"/>
-    <rect x="78" y="60" width="4" height="4" fill="#CC2222"/>
-    <!-- Legs -->
-    <rect x="36" y="72" width="10" height="12" fill="#CC7850"/>
-    <rect x="50" y="72" width="10" height="12" fill="#CC7850"/>
-    <rect x="60" y="72" width="10" height="12" fill="#CC7850"/>
-    <rect x="74" y="72" width="10" height="12" fill="#CC7850"/>
+<svg width="360" height="240" viewBox="0 0 360 240"
+  xmlns="http://www.w3.org/2000/svg" aria-label="Error">
+  <defs>
+    <filter id="fC" x="-15%" y="-15%" width="130%" height="130%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <filter id="fG" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="5"/>
+    </filter>
+    <filter id="fB" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+    <filter id="fF" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="0.3"/>
+    </filter>
+    <filter id="fH" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="1.5"/>
+    </filter>
+  </defs>
+  <style>
+  .cloud{animation:shake .5s ease-in-out infinite}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}40%{transform:translateX(9px)}60%{transform:translateX(-7px)}80%{transform:translateX(7px)}}</style>
+  <g class="cloud">
+  <g filter="url(#fC)">
+    <ellipse cx="180" cy="178" rx="128" ry="43" fill="#FF9A59"/>
+    <circle cx="64"  cy="152" r="34" fill="#FF9A59"/>
+    <circle cx="122" cy="118" r="50" fill="#FF9A59"/>
+    <circle cx="173" cy="87"  r="56" fill="#FF9A59"/>
+    <circle cx="230" cy="111" r="53" fill="#FFA76C"/>
+    <circle cx="293" cy="148" r="37" fill="#FFA76C"/>
+  </g>
+  <g filter="url(#fG)">
+    <ellipse cx="165" cy="96" rx="44" ry="23" fill="#FFCF90" opacity="0.48"/>
+  </g>
+  <g class="hand-l" filter="url(#fH)"><circle cx="105" cy="188" r="18" fill="#FFB87A"/></g>
+  <g class="hand-r" filter="url(#fH)"><circle cx="255" cy="186" r="18" fill="#FFB87A"/></g>  <ellipse cx="136" cy="161" rx="24" ry="11" fill="#FF6080" opacity="0.35" filter="url(#fB)"/>
+  <ellipse cx="224" cy="161" rx="24" ry="11" fill="#FF6080" opacity="0.35" filter="url(#fB)"/>  <g filter="url(#fF)">
+    <ellipse cx="150" cy="145" rx="16" ry="19" fill="#1E0A00"/>
+    <ellipse cx="144" cy="138" rx="5.5" ry="6.5" fill="#FFF" opacity="0.95"/>
+    <ellipse cx="210" cy="145" rx="16" ry="19" fill="#1E0A00"/>
+    <ellipse cx="204" cy="138" rx="5.5" ry="6.5" fill="#FFF" opacity="0.95"/>
+  </g>  <g filter="url(#fF)">
+    <ellipse cx="180" cy="173" rx="8" ry="9" fill="#1E0A00"/>
+  </g>
   </g>
 </svg>
