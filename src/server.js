@@ -7,9 +7,8 @@ const HOST = '127.0.0.1'
  * 로컬 HTTP 서버: Claude Code 훅 스크립트에서 POST /state 를 수신
  * 외부 네트워크로 나가는 통신 없음 — 127.0.0.1 전용
  */
-export function createServer(mainWindow) {
+export function createServer(mainWindow, callbacks = {}) {
   const server = http.createServer((req, res) => {
-    // CORS 불필요 (로컬 전용), 기본 헤더만 설정
     res.setHeader('Content-Type', 'application/json')
 
     if (req.method === 'POST' && req.url === '/state') {
@@ -18,7 +17,7 @@ export function createServer(mainWindow) {
       req.on('end', () => {
         try {
           const payload = JSON.parse(body)
-          handleStateEvent(payload, mainWindow)
+          handleStateEvent(payload, mainWindow, callbacks)
           res.writeHead(200)
           res.end(JSON.stringify({ ok: true }))
         } catch {
@@ -56,11 +55,6 @@ export function createServer(mainWindow) {
 
 /**
  * 훅 이벤트 → 상태 이름 매핑
- *
- * 우선순위 (높음 → 낮음):
- *   error(8) > notification(7) > sweeping(6) > attention(5)
- *   > juggling(4) > carrying(4) > working(3) > thinking(2)
- *   > idle(1) > sleeping(0)
  */
 const EVENT_STATE_MAP = {
   UserPromptSubmit:    'working',
@@ -74,20 +68,22 @@ const EVENT_STATE_MAP = {
   Stop:                'notification',
   StopFailure:         'error',
   Notification:        'notification',
-  SessionStart:        null,   // 세션 등록만, 상태 변경 없음
+  SessionStart:        null,
   SessionEnd:          'idle',
 }
 
-// 권한 대기 감지: PreToolUse 후 PostToolUse가 일정 시간 내에 안 오면 알림
+// 권한 대기 감지: PreToolUse 후 PostToolUse가 일정 시간 내에 안 오면 팝업
 const PERMISSION_WAIT_MS = 2000
 let permissionTimer = null
+let lastToolName = null
+let lastToolInput = null
 
 function sendState(mainWindow, state, event, sessionId) {
   mainWindow?.webContents.send('pet:state-changed', { state, event, sessionId })
 }
 
-function handleStateEvent(payload, mainWindow) {
-  const { event, sessionId, cwd, state: directState } = payload
+function handleStateEvent(payload, mainWindow, callbacks) {
+  const { event, sessionId, cwd, toolName, toolInput, state: directState } = payload
 
   console.log(`[server] event=${event} session=${sessionId ?? '-'} cwd=${cwd ?? '-'}`)
 
@@ -99,16 +95,34 @@ function handleStateEvent(payload, mainWindow) {
 
   // 권한 대기 감지 로직
   if (event === 'PreToolUse') {
+    lastToolName  = toolName  ?? null
+    lastToolInput = toolInput ?? null
+
     clearTimeout(permissionTimer)
     permissionTimer = setTimeout(() => {
-      console.log('[server] 권한 대기 중으로 판단 → notification')
-      sendState(mainWindow, 'notification', 'PermissionWait', sessionId)
+      console.log('[server] 권한 대기 중으로 판단')
+
+      const isAlways = callbacks.isAlwaysAllowed?.(lastToolName)
+      if (isAlways) {
+        // 항상 허용 목록에 있으면 자동 승인
+        console.log(`[server] 항상 허용 목록: ${lastToolName} → 자동 승인`)
+        callbacks.onAutoApprove?.()
+      } else {
+        // 팝업 표시
+        sendState(mainWindow, 'notification', 'PermissionWait', sessionId)
+        callbacks.onPermissionNeeded?.({
+          toolName:  lastToolName,
+          toolInput: lastToolInput,
+          sessionId,
+        })
+      }
     }, PERMISSION_WAIT_MS)
   }
 
   if (event === 'PostToolUse' || event === 'PostToolUseFailure' || event === 'Stop') {
     clearTimeout(permissionTimer)
     permissionTimer = null
+    callbacks.onPermissionResolved?.()
   }
 
   const targetState = EVENT_STATE_MAP[event]
@@ -116,7 +130,7 @@ function handleStateEvent(payload, mainWindow) {
     console.warn(`[server] unknown event: ${event}`)
     return
   }
-  if (targetState === null) return  // SessionStart 등 상태 변경 없는 이벤트
+  if (targetState === null) return
 
   sendState(mainWindow, targetState, event, sessionId)
 }

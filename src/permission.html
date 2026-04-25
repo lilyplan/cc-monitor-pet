@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 300px;
+      height: 100px;
+      background: transparent;
+      overflow: hidden;
+      user-select: none;
+      font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif;
+    }
+
+    .card {
+      width: 300px;
+      height: 100px;
+      background: rgba(28, 28, 30, 0.92);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 18px;
+      padding: 16px 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      animation: pop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes pop {
+      from { transform: translateY(10px) scale(0.97); opacity: 0; }
+      to   { transform: translateY(0)    scale(1);    opacity: 1; }
+    }
+
+    .title {
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.88);
+      text-align: center;
+      letter-spacing: -0.1px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .buttons button {
+      flex: 1;
+      height: 34px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      transition: opacity 0.12s, transform 0.1s;
+    }
+
+    .buttons button:hover  { opacity: 0.82; }
+    .buttons button:active { transform: scale(0.96); opacity: 0.65; }
+
+    /* 거부: 흐린 배경 */
+    .btn-deny {
+      background: rgba(255, 255, 255, 0.10);
+      color: rgba(255, 255, 255, 0.65);
+    }
+
+    /* 허용: 코럴 주황 (이미지 참고) */
+    .btn-allow {
+      background: #E8735A;
+      color: #fff;
+    }
+
+    /* 항상 허용: 진한 주황 */
+    .btn-always {
+      background: #D45F44;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="title">🔐 도구 실행 권한 요청</div>
+    <div class="buttons">
+      <button class="btn-deny"   onclick="decide('deny')">거부</button>
+      <button class="btn-allow"  onclick="decide('allow')">허용</button>
+      <button class="btn-always" onclick="decide('always')">항상 허용</button>
+    </div>
+  </div>
+  <script src="permission.js"></script>
+</body>
+</html>

@@ -36,6 +36,7 @@ function sendToServer(payload) {
     sessionId: payload.session_id,
     cwd:       payload.cwd,
     toolName:  payload.tool_name,
+    toolInput: payload.tool_input,
     error:     payload.error,
   })
 

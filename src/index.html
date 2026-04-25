@@ -8,8 +8,8 @@
     * { margin: 0; padding: 0; box-sizing: border-box; background: transparent; }
 
     html, body {
-      width: 140px;
-      height: 140px;
+      width: 112px;
+      height: 112px;
       background: transparent !important;
       overflow: hidden;
       user-select: none;
@@ -17,8 +17,8 @@
     }
 
     #pet-container {
-      width: 140px;
-      height: 140px;
+      width: 112px;
+      height: 112px;
       display: flex;
       align-items: flex-end;
       justify-content: center;
@@ -27,8 +27,8 @@
 
     /* 채널 A: 아이 트래킹 전용 */
     #ch-follow {
-      width: 120px;
-      height: 120px;
+      width: 96px;
+      height: 96px;
       position: absolute;
       bottom: 0;
       display: none;
@@ -39,8 +39,8 @@
 
     /* 채널 B: 일반 SVG innerHTML */
     #ch-sprite {
-      width: 120px;
-      height: 120px;
+      width: 96px;
+      height: 96px;
       position: absolute;
       bottom: 0;
       display: flex;
@@ -48,14 +48,14 @@
       justify-content: center;
       transition: opacity 0.2s ease;
     }
-    #ch-sprite svg { width: 120px; height: 120px; }
+    #ch-sprite svg { width: 96px; height: 96px; }
 
-    /* 투명 우클릭 오버레이 — 전체 140x140 커버, 드래그 허용 */
+    /* 투명 우클릭 오버레이 */
     #hit-area {
       position: absolute;
       inset: 0;
-      width: 140px;
-      height: 140px;
+      width: 112px;
+      height: 112px;
       background: transparent;
       -webkit-app-region: no-drag;
       z-index: 100;
@@ -67,8 +67,6 @@
   <div id="pet-container">
     <object id="ch-follow" type="image/svg+xml" data=""></object>
     <div id="ch-sprite"></div>
-
-    <!-- 전체 영역 우클릭 감지용 투명 오버레이 -->
     <div id="hit-area"></div>
   </div>
   <script src="renderer.js"></script>

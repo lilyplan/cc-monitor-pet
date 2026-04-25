@@ -1,4 +1,7 @@
 import { app, BrowserWindow, ipcMain, screen, Menu, shell } from 'electron'
+import { exec } from 'child_process'
+import { writeFileSync, unlinkSync } from 'fs'
+import os from 'os'
 import { createServer } from './server.js'
 import { loadPrefs, savePrefs } from './prefs.js'
 import path from 'path'
@@ -6,31 +9,40 @@ import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-let mainWindow = null
-let prefs = {}
+const PET_SIZE = 112   // 20% 축소 (140 → 112)
+
+let mainWindow       = null
+let permissionWindow = null
+let prefs            = {}
 
 app.whenReady().then(async () => {
   prefs = loadPrefs()
   mainWindow = createPetWindow()
-  createServer(mainWindow)
+  createServer(mainWindow, {
+    isAlwaysAllowed:    (toolName) => (loadPrefs().alwaysAllowed ?? []).includes(toolName),
+    onPermissionNeeded: showPermissionWindow,
+    onPermissionResolved: closePermissionWindow,
+    onAutoApprove:      () => sendTerminalKeystroke('y'),
+  })
 })
 
 app.on('window-all-closed', () => {
   app.quit()
 })
 
+// ── 펫 창 ────────────────────────────────────────────────────────────────────
+
 function createPetWindow() {
   const { width: sw, height: wah } = screen.getPrimaryDisplay().workAreaSize
 
-  // X만 저장 위치 사용, Y는 항상 작업 영역(독 제외) 최하단에 고정
   const x = prefs.windowX ?? 20
-  const y = wah - 140
+  const y = wah - PET_SIZE
 
-  console.log(`[main] 화면 크기: ${sw}x${wah}(workArea), 창 위치: ${x},${y}`)
+  console.log(`[main] 화면: ${sw}x${wah}(workArea), 창: ${x},${y}, 크기: ${PET_SIZE}x${PET_SIZE}`)
 
   const win = new BrowserWindow({
-    width: 140,
-    height: 140,
+    width: PET_SIZE,
+    height: PET_SIZE,
     x,
     y,
     frame: false,
@@ -39,7 +51,7 @@ function createPetWindow() {
     resizable: false,
     skipTaskbar: true,
     hasShadow: false,
-    show: false,   // 렌더 완료 후 표시 (흰 배경 방지)
+    show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
       contextIsolation: true,
@@ -51,12 +63,8 @@ function createPetWindow() {
   win.setAlwaysOnTop(true, 'screen-saver')
   win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
 
-  // 렌더링 완료 후 투명하게 표시
-  win.once('ready-to-show', () => {
-    win.show()
-  })
+  win.once('ready-to-show', () => { win.show() })
 
-  // X 위치만 저장 (Y는 항상 화면 최하단 고정)
   win.on('moved', () => {
     const [wx] = win.getPosition()
     savePrefs({ ...loadPrefs(), windowX: wx })
@@ -65,12 +73,122 @@ function createPetWindow() {
   return win
 }
 
-// 렌더러 → 메인: 상태 변경 이벤트 (서버에서 받아서 렌더러로 전달)
+// ── Permission 팝업 창 ─────────────────────────────────────────────────────
+
+function showPermissionWindow(toolInfo) {
+  // 이미 열려 있으면 데이터만 갱신
+  if (permissionWindow && !permissionWindow.isDestroyed()) {
+    permissionWindow.webContents.send('perm:data', toolInfo)
+    permissionWindow.show()
+    return
+  }
+
+  const { width: sw, height: wah } = screen.getPrimaryDisplay().workAreaSize
+  const popW = 300, popH = 100
+  const petX  = (loadPrefs().windowX ?? 20)
+
+  // 팝업 위치: 펫 위쪽, 화면 밖 벗어나지 않게 보정
+  let px = Math.round(petX - (popW - PET_SIZE) / 2)
+  px = Math.max(10, Math.min(px, sw - popW - 10))
+  const py = Math.max(10, wah - PET_SIZE - popH - 16)
+
+  permissionWindow = new BrowserWindow({
+    width: popW,
+    height: popH,
+    x: px,
+    y: py,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    resizable: false,
+    skipTaskbar: true,
+    hasShadow: false,
+    show: false,
+    webPreferences: {
+      preload: path.join(__dirname, 'permission-preload.cjs'),
+      contextIsolation: true,
+      sandbox: false,
+    },
+  })
+
+  permissionWindow.loadFile(path.join(__dirname, 'permission.html'))
+  permissionWindow.setAlwaysOnTop(true, 'screen-saver')
+  permissionWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+
+  permissionWindow.webContents.on('did-finish-load', () => {
+    permissionWindow.webContents.send('perm:data', toolInfo)
+    permissionWindow.show()
+  })
+
+  permissionWindow.on('closed', () => { permissionWindow = null })
+}
+
+function closePermissionWindow() {
+  if (permissionWindow && !permissionWindow.isDestroyed()) {
+    permissionWindow.close()
+    permissionWindow = null
+  }
+}
+
+// ── Permission 결정 처리 ──────────────────────────────────────────────────
+
+ipcMain.on('perm:decide', (_, { decision, toolName }) => {
+  if (decision === 'always') {
+    // prefs에 항상 허용 목록 추가
+    const p = loadPrefs()
+    const list = p.alwaysAllowed ?? []
+    if (toolName && !list.includes(toolName)) {
+      savePrefs({ ...p, alwaysAllowed: [...list, toolName] })
+      console.log(`[main] 항상 허용 추가: ${toolName}`)
+    }
+  }
+
+  if (decision === 'allow' || decision === 'always') {
+    sendTerminalKeystroke('y')
+  } else if (decision === 'deny') {
+    sendTerminalKeystroke('n')
+  }
+  // 'dismiss': 키 입력 없이 팝업만 닫기
+
+  closePermissionWindow()
+})
+
+// ── AppleScript로 터미널에 키 입력 전송 ──────────────────────────────────
+
+function sendTerminalKeystroke(key) {
+  const script = `set termNames to {"Terminal", "iTerm2", "iTerm", "Warp", "Alacritty", "kitty", "Hyper"}
+tell application "System Events"
+  repeat with tName in termNames
+    try
+      if exists process tName then
+        set frontmost of process tName to true
+        delay 0.25
+        keystroke "${key}"
+        key code 36
+        return
+      end if
+    end try
+  end repeat
+end tell`
+
+  const tmp = path.join(os.tmpdir(), 'cc-pet-key.applescript')
+  try {
+    writeFileSync(tmp, script, 'utf8')
+    exec(`osascript "${tmp}"`, (err) => {
+      try { unlinkSync(tmp) } catch {}
+      if (err) console.warn('[main] keystroke 실패 (접근성 권한 필요):', err.message)
+    })
+  } catch (e) {
+    console.warn('[main] AppleScript 실패:', e.message)
+  }
+}
+
+// ── IPC: 렌더러 → 메인 ───────────────────────────────────────────────────
+
 ipcMain.on('pet:set-state', (_, state) => {
   mainWindow?.webContents.send('pet:state-changed', state)
 })
 
-// 우클릭 컨텍스트 메뉴
 ipcMain.on('pet:show-context-menu', (event) => {
   const win = BrowserWindow.fromWebContents(event.sender)
   const menu = Menu.buildFromTemplate([
@@ -79,7 +197,6 @@ ipcMain.on('pet:show-context-menu', (event) => {
   menu.popup({ window: win })
 })
 
-// 좌클릭 → Claude 앱 또는 claude.ai 열기
 ipcMain.on('pet:open-claude', () => {
   shell.openPath('/Applications/Claude.app').then(err => {
     if (err) shell.openExternal('https://claude.ai')
