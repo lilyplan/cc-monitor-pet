@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "sprites-preview",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-p", "5173", "assets/themes/cc/sprites"],
+      "port": 5173
+    }
+  ]
+}
