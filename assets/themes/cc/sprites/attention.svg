@@ -45,11 +45,11 @@
     <ellipse cx="165" cy="96" rx="44" ry="23" fill="#FFCF90" opacity="0.48"/>
   </g>
   <g class="hand-l" filter="url(#fH)"><circle cx="105" cy="188" r="18" fill="#FFB87A"/></g>
-  <g class="hand-r" filter="url(#fH)"><circle cx="255" cy="186" r="18" fill="#FFB87A"/></g>  <g class="sp"><text x="50"  y="82"  font-size="16" fill="#FFD700" font-family="Arial">✦</text></g>
-  <g class="sp"><text x="274" y="76"  font-size="13" fill="#FFD700" font-family="Arial">✦</text></g>
-  <g class="sp"><text x="308" y="108" font-size="11" fill="#FFD700" font-family="Arial">✦</text></g>
-  <g class="sp"><text x="36"  y="116" font-size="11" fill="#FFD700" font-family="Arial">✦</text></g>
-  <g class="sp"><text x="176" y="50"  font-size="18" fill="#FFD700" font-family="Arial">✦</text></g>  <ellipse cx="136" cy="161" rx="24" ry="11" fill="#FF6080" opacity="0.35" filter="url(#fB)"/>
+  <g class="hand-r" filter="url(#fH)"><circle cx="255" cy="186" r="18" fill="#FFB87A"/></g>  <g class="sp"><text x="50"  y="82"  font-size="26" fill="#FFFF00" font-family="Arial">✦</text></g>
+  <g class="sp"><text x="274" y="76"  font-size="22" fill="#FFFF00" font-family="Arial">✦</text></g>
+  <g class="sp"><text x="308" y="108" font-size="20" fill="#FFFF00" font-family="Arial">✦</text></g>
+  <g class="sp"><text x="36"  y="116" font-size="20" fill="#FFFF00" font-family="Arial">✦</text></g>
+  <g class="sp"><text x="176" y="50"  font-size="30" fill="#FFFF00" font-family="Arial">✦</text></g>  <ellipse cx="136" cy="161" rx="24" ry="11" fill="#FF6080" opacity="0.35" filter="url(#fB)"/>
   <ellipse cx="224" cy="161" rx="24" ry="11" fill="#FF6080" opacity="0.35" filter="url(#fB)"/>  <g filter="url(#fF)">
     <path d="M 136 150 Q 150 135 164 150" stroke="#1E0A00" stroke-width="3" fill="none" stroke-linecap="round"/>
     <path d="M 196 150 Q 210 135 224 150" stroke="#1E0A00" stroke-width="3" fill="none" stroke-linecap="round"/>

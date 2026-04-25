@@ -135,23 +135,36 @@
 
   // ── 채널 전환 ────────────────────────────────────────────────
 
+  const FADE_MS = 150
+
   function showFollow() {
-    followObj.style.display = 'block'
-    spriteDiv.style.display = 'none'
-    // 절대 경로로 설정 (file:// 프로토콜, 상대 경로 문제 없음)
-    if (followObj.getAttribute('data') !== FOLLOW_PATH) {
-      svgDoc = null
-      eyeTracking = false
-      followObj.setAttribute('data', FOLLOW_PATH)
-    }
-    eyeTracking = !!svgDoc
+    const active = followObj.style.display !== 'none' ? followObj : spriteDiv
+    active.style.opacity = '0'
+    setTimeout(() => {
+      spriteDiv.style.display = 'none'
+      followObj.style.display = 'block'
+      followObj.style.opacity = '0'
+      if (followObj.getAttribute('data') !== FOLLOW_PATH) {
+        svgDoc = null
+        eyeTracking = false
+        followObj.setAttribute('data', FOLLOW_PATH)
+      }
+      eyeTracking = !!svgDoc
+      requestAnimationFrame(() => { followObj.style.opacity = '1' })
+    }, FADE_MS)
   }
 
   function showSprite(svgText) {
-    followObj.style.display = 'none'
-    spriteDiv.style.display = 'flex'
-    eyeTracking = false
-    spriteDiv.innerHTML = svgText ?? ''
+    const active = spriteDiv.style.display !== 'none' ? spriteDiv : followObj
+    active.style.opacity = '0'
+    setTimeout(() => {
+      followObj.style.display = 'none'
+      spriteDiv.style.display = 'flex'
+      spriteDiv.style.opacity = '0'
+      eyeTracking = false
+      spriteDiv.innerHTML = svgText ?? ''
+      requestAnimationFrame(() => { spriteDiv.style.opacity = '1' })
+    }, FADE_MS)
   }
 
   // ── 스프라이트 설정 ──────────────────────────────────────────
