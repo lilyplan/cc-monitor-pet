@@ -84,13 +84,17 @@ function showPermissionWindow(toolInfo) {
   }
 
   const { width: sw, height: wah } = screen.getPrimaryDisplay().workAreaSize
-  const popW = 300, popH = 100
+  const popW = 200, popH = 62
   const petX  = (loadPrefs().windowX ?? 20)
 
-  // 팝업 위치: 펫 위쪽, 화면 밖 벗어나지 않게 보정
-  let px = Math.round(petX - (popW - PET_SIZE) / 2)
+  // 팝업 위치: 캐릭터 머리 바로 위 5px
+  // 캐릭터 SVG(96px)는 창(112px) 하단 정렬 → 머리 위치 = wah - 96
+  const charTop = wah - 96
+  const py = Math.max(10, charTop - popH - 5)
+
+  // X: 캐릭터 중앙 기준 팝업 중앙 정렬
+  let px = Math.round(petX + PET_SIZE / 2 - popW / 2)
   px = Math.max(10, Math.min(px, sw - popW - 10))
-  const py = Math.max(10, wah - PET_SIZE - popH - 16)
 
   permissionWindow = new BrowserWindow({
     width: popW,
