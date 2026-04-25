@@ -87,13 +87,18 @@ function sendState(mainWindow, state, event, sessionId) {
 }
 
 function handleStateEvent(payload, mainWindow) {
-  const { event, sessionId, cwd } = payload
+  const { event, sessionId, cwd, state: directState } = payload
 
   console.log(`[server] event=${event} session=${sessionId ?? '-'} cwd=${cwd ?? '-'}`)
 
+  // MCP signal_pet 등 state가 직접 지정된 경우 (이벤트 매핑 우회)
+  if (directState && !(event in EVENT_STATE_MAP)) {
+    sendState(mainWindow, directState, event, sessionId)
+    return
+  }
+
   // 권한 대기 감지 로직
   if (event === 'PreToolUse') {
-    // PostToolUse 가 PERMISSION_WAIT_MS 내에 안 오면 권한 대기 중으로 판단
     clearTimeout(permissionTimer)
     permissionTimer = setTimeout(() => {
       console.log('[server] 권한 대기 중으로 판단 → notification')
@@ -102,7 +107,6 @@ function handleStateEvent(payload, mainWindow) {
   }
 
   if (event === 'PostToolUse' || event === 'PostToolUseFailure' || event === 'Stop') {
-    // 도구 완료 또는 세션 종료 → 권한 타이머 해제
     clearTimeout(permissionTimer)
     permissionTimer = null
   }
