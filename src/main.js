@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, screen, Menu, shell } from 'electron'
+import { app, BrowserWindow, ipcMain, screen, Menu, shell, systemPreferences, dialog } from 'electron'
 import { exec } from 'child_process'
 import { writeFileSync, unlinkSync } from 'fs'
 import os from 'os'
@@ -137,6 +137,7 @@ function closePermissionWindow() {
 // ── Permission 결정 처리 ──────────────────────────────────────────────────
 
 ipcMain.on('perm:decide', (_, { decision, toolName }) => {
+  console.log(`[main] perm:decide: ${decision} / ${toolName}`)
   if (decision === 'always') {
     // prefs에 항상 허용 목록 추가
     const p = loadPrefs()
@@ -160,6 +161,23 @@ ipcMain.on('perm:decide', (_, { decision, toolName }) => {
 // ── AppleScript로 터미널에 키 입력 전송 ──────────────────────────────────
 
 function sendTerminalKeystroke(key) {
+  // 손쉬운 사용(Accessibility) 권한 확인
+  const trusted = systemPreferences.isTrustedAccessibilityClient(false)
+  console.log(`[main] Accessibility 권한: ${trusted}`)
+
+  if (!trusted) {
+    dialog.showMessageBox({
+      type: 'info',
+      title: 'CC Monitor Pet — 권한 필요',
+      message: '터미널 자동 입력을 위해 손쉬운 사용 권한이 필요합니다.',
+      detail: '시스템 설정 → 개인 정보 보호 및 보안 → 손쉬운 사용에서\n"Electron" 또는 앱을 허용한 뒤 다시 시도해주세요.',
+      buttons: ['설정 열기', '닫기'],
+    }).then(({ response }) => {
+      if (response === 0) systemPreferences.isTrustedAccessibilityClient(true)
+    })
+    return
+  }
+
   const script = `set termNames to {"Terminal", "iTerm2", "iTerm", "Warp", "Alacritty", "kitty", "Hyper"}
 tell application "System Events"
   repeat with tName in termNames
@@ -180,7 +198,7 @@ end tell`
     writeFileSync(tmp, script, 'utf8')
     exec(`osascript "${tmp}"`, (err) => {
       try { unlinkSync(tmp) } catch {}
-      if (err) console.warn('[main] keystroke 실패 (접근성 권한 필요):', err.message)
+      if (err) console.warn('[main] keystroke 실패:', err.message)
     })
   } catch (e) {
     console.warn('[main] AppleScript 실패:', e.message)
