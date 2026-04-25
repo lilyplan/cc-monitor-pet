@@ -20,14 +20,13 @@ app.on('window-all-closed', () => {
 })
 
 function createPetWindow() {
-  const { width: sw } = screen.getPrimaryDisplay().workAreaSize
-  const { height: fh } = screen.getPrimaryDisplay().bounds  // 독 포함 전체 화면 높이
+  const { width: sw, height: wah } = screen.getPrimaryDisplay().workAreaSize
 
-  // X만 저장 위치 사용, Y는 항상 현재 화면 최하단에 고정
+  // X만 저장 위치 사용, Y는 항상 작업 영역(독 제외) 최하단에 고정
   const x = prefs.windowX ?? 20
-  const y = fh - 130
+  const y = wah - 140
 
-  console.log(`[main] 화면 크기: ${sw}x${fh}, 창 위치: ${x},${y}`)
+  console.log(`[main] 화면 크기: ${sw}x${wah}(workArea), 창 위치: ${x},${y}`)
 
   const win = new BrowserWindow({
     width: 140,
