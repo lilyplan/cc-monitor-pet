@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain, screen, Menu, shell, systemPreferences, dialog } from 'electron'
 import { exec } from 'child_process'
-import { writeFileSync, unlinkSync } from 'fs'
+import { writeFileSync, unlinkSync, chmodSync } from 'fs'
+import crypto from 'crypto'
 import os from 'os'
 import { createServer } from './server.js'
 import { loadPrefs, savePrefs } from './prefs.js'
@@ -9,24 +10,38 @@ import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-const PET_SIZE = 112   // 20% 축소 (140 → 112)
+const PET_SIZE   = 112
+const TOKEN_PATH = path.join(os.homedir(), '.cc-monitor-pet.token')
 
 let mainWindow       = null
 let permissionWindow = null
 let prefs            = {}
 
+// ── 시작 시 랜덤 토큰 생성 (hook.js / MCP 서버가 읽어서 헤더에 포함) ──────
+function generateToken() {
+  const token = crypto.randomBytes(32).toString('hex')
+  writeFileSync(TOKEN_PATH, token, { encoding: 'utf8', mode: 0o600 })
+  try { chmodSync(TOKEN_PATH, 0o600) } catch {}   // 소유자만 읽기
+  console.log('[main] 인증 토큰 생성 완료')
+  return token
+}
+
 app.whenReady().then(async () => {
+  const secretToken = generateToken()
   prefs = loadPrefs()
   mainWindow = createPetWindow()
   createServer(mainWindow, {
-    isAlwaysAllowed:    (toolName) => (loadPrefs().alwaysAllowed ?? []).includes(toolName),
-    onPermissionNeeded: showPermissionWindow,
+    secretToken,
+    isAlwaysAllowed:      (toolName) => (loadPrefs().alwaysAllowed ?? []).includes(toolName),
+    onPermissionNeeded:   showPermissionWindow,
     onPermissionResolved: closePermissionWindow,
-    onAutoApprove:      () => sendTerminalKeystroke('y'),
+    onAutoApprove:        () => sendTerminalKeystroke('y'),
   })
 })
 
 app.on('window-all-closed', () => {
+  // 종료 시 토큰 파일 삭제
+  try { unlinkSync(TOKEN_PATH) } catch {}
   app.quit()
 })
 
@@ -76,7 +91,6 @@ function createPetWindow() {
 // ── Permission 팝업 창 ─────────────────────────────────────────────────────
 
 function showPermissionWindow(toolInfo) {
-  // 이미 열려 있으면 데이터만 갱신
   if (permissionWindow && !permissionWindow.isDestroyed()) {
     permissionWindow.webContents.send('perm:data', toolInfo)
     permissionWindow.show()
@@ -87,12 +101,8 @@ function showPermissionWindow(toolInfo) {
   const popW = 200, popH = 62
   const petX  = (loadPrefs().windowX ?? 20)
 
-  // 팝업 위치: 캐릭터 머리 바로 위 5px
-  // 캐릭터 SVG(96px)는 창(112px) 하단 정렬 → 머리 위치 = wah - 96
   const charTop = wah - 96
   const py = Math.max(10, charTop - popH - 5)
-
-  // X: 캐릭터 중앙 기준 팝업 중앙 정렬
   let px = Math.round(petX + PET_SIZE / 2 - popW / 2)
   px = Math.max(10, Math.min(px, sw - popW - 10))
 
@@ -138,8 +148,8 @@ function closePermissionWindow() {
 
 ipcMain.on('perm:decide', (_, { decision, toolName }) => {
   console.log(`[main] perm:decide: ${decision} / ${toolName}`)
+
   if (decision === 'always') {
-    // prefs에 항상 허용 목록 추가
     const p = loadPrefs()
     const list = p.alwaysAllowed ?? []
     if (toolName && !list.includes(toolName)) {
@@ -153,7 +163,6 @@ ipcMain.on('perm:decide', (_, { decision, toolName }) => {
   } else if (decision === 'deny') {
     sendTerminalKeystroke('n')
   }
-  // 'dismiss': 키 입력 없이 팝업만 닫기
 
   closePermissionWindow()
 })
@@ -161,7 +170,6 @@ ipcMain.on('perm:decide', (_, { decision, toolName }) => {
 // ── AppleScript로 터미널에 키 입력 전송 ──────────────────────────────────
 
 function sendTerminalKeystroke(key) {
-  // 손쉬운 사용(Accessibility) 권한 확인
   const trusted = systemPreferences.isTrustedAccessibilityClient(false)
   console.log(`[main] Accessibility 권한: ${trusted}`)
 
@@ -193,9 +201,10 @@ tell application "System Events"
   end repeat
 end tell`
 
-  const tmp = path.join(os.tmpdir(), 'cc-pet-key.applescript')
+  // 매번 랜덤 파일명으로 심볼릭링크 공격 방지
+  const tmp = path.join(os.tmpdir(), `cc-pet-${crypto.randomUUID()}.applescript`)
   try {
-    writeFileSync(tmp, script, 'utf8')
+    writeFileSync(tmp, script, { encoding: 'utf8', mode: 0o600 })
     exec(`osascript "${tmp}"`, (err) => {
       try { unlinkSync(tmp) } catch {}
       if (err) console.warn('[main] keystroke 실패:', err.message)

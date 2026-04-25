@@ -1,19 +1,42 @@
 import http from 'http'
 
-const PORT = 23333
-const HOST = '127.0.0.1'
+const PORT     = 23333
+const HOST     = '127.0.0.1'
+const MAX_BODY = 65536   // 64KB — 초과 시 413 반환
 
 /**
  * 로컬 HTTP 서버: Claude Code 훅 스크립트에서 POST /state 를 수신
  * 외부 네트워크로 나가는 통신 없음 — 127.0.0.1 전용
  */
 export function createServer(mainWindow, callbacks = {}) {
+  const { secretToken } = callbacks
+
   const server = http.createServer((req, res) => {
     res.setHeader('Content-Type', 'application/json')
 
+    // ── 토큰 인증 ──────────────────────────────────────────────
+    if (secretToken) {
+      const clientToken = req.headers['x-pet-token']
+      if (clientToken !== secretToken) {
+        console.warn(`[server] 인증 실패 — 토큰 불일치 (${req.method} ${req.url})`)
+        res.writeHead(403)
+        res.end(JSON.stringify({ error: 'forbidden' }))
+        return
+      }
+    }
+
     if (req.method === 'POST' && req.url === '/state') {
       let body = ''
-      req.on('data', chunk => { body += chunk })
+      req.on('data', chunk => {
+        body += chunk
+        // ── 바디 크기 제한 ──────────────────────────────────────
+        if (body.length > MAX_BODY) {
+          console.warn('[server] 바디 크기 초과 — 요청 거부')
+          req.destroy()
+          res.writeHead(413)
+          res.end(JSON.stringify({ error: 'payload too large' }))
+        }
+      })
       req.on('end', () => {
         try {
           const payload = JSON.parse(body)
@@ -72,11 +95,10 @@ const EVENT_STATE_MAP = {
   SessionEnd:          'idle',
 }
 
-// 권한 대기 감지: PreToolUse 후 PostToolUse가 일정 시간 내에 안 오면 팝업
 const PERMISSION_WAIT_MS = 2000
 let permissionTimer = null
-let lastToolName = null
-let lastToolInput = null
+let lastToolName    = null
+let lastToolInput   = null
 
 function sendState(mainWindow, state, event, sessionId) {
   mainWindow?.webContents.send('pet:state-changed', { state, event, sessionId })
@@ -93,7 +115,6 @@ function handleStateEvent(payload, mainWindow, callbacks) {
     return
   }
 
-  // 권한 대기 감지 로직
   if (event === 'PreToolUse') {
     lastToolName  = toolName  ?? null
     lastToolInput = toolInput ?? null
@@ -101,20 +122,13 @@ function handleStateEvent(payload, mainWindow, callbacks) {
     clearTimeout(permissionTimer)
     permissionTimer = setTimeout(() => {
       console.log('[server] 권한 대기 중으로 판단')
-
       const isAlways = callbacks.isAlwaysAllowed?.(lastToolName)
       if (isAlways) {
-        // 항상 허용 목록에 있으면 자동 승인
         console.log(`[server] 항상 허용 목록: ${lastToolName} → 자동 승인`)
         callbacks.onAutoApprove?.()
       } else {
-        // 팝업 표시
         sendState(mainWindow, 'notification', 'PermissionWait', sessionId)
-        callbacks.onPermissionNeeded?.({
-          toolName:  lastToolName,
-          toolInput: lastToolInput,
-          sessionId,
-        })
+        callbacks.onPermissionNeeded?.({ toolName: lastToolName, toolInput: lastToolInput, sessionId })
       }
     }, PERMISSION_WAIT_MS)
   }

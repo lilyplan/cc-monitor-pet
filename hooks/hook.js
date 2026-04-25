@@ -10,21 +10,36 @@
  */
 
 import http from 'http'
+import fs   from 'fs'
+import path from 'path'
+import os   from 'os'
 
-const SERVER_HOST = '127.0.0.1'
-const SERVER_PORT = 23333
-const TIMEOUT_MS  = 1000   // 서버 미실행 시 빠르게 포기
+const SERVER_HOST  = '127.0.0.1'
+const SERVER_PORT  = 23333
+const TIMEOUT_MS   = 1000
+const MAX_INPUT    = 65536   // 64KB stdin 제한
+const TOKEN_PATH   = path.join(os.homedir(), '.cc-monitor-pet.token')
+
+// 인증 토큰 읽기 (앱 미실행 시 빈 문자열)
+let secretToken = ''
+try { secretToken = fs.readFileSync(TOKEN_PATH, 'utf8').trim() } catch {}
 
 // stdin에서 이벤트 JSON 읽기
 let raw = ''
 process.stdin.setEncoding('utf8')
-process.stdin.on('data', chunk => { raw += chunk })
+process.stdin.on('data', chunk => {
+  raw += chunk
+  if (raw.length > MAX_INPUT) {
+    process.stderr.write('[cc-pet] stdin 크기 초과, 무시\n')
+    process.exit(0)
+  }
+})
 process.stdin.on('end', () => {
   let payload
   try {
     payload = JSON.parse(raw)
   } catch {
-    process.exit(0)  // 파싱 실패 시 Claude Code 흐름 방해하지 않고 종료
+    process.exit(0)
   }
 
   sendToServer(payload)
@@ -46,17 +61,21 @@ function sendToServer(payload) {
       port:     SERVER_PORT,
       path:     '/state',
       method:   'POST',
-      headers:  { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) },
-      timeout:  TIMEOUT_MS,
+      headers:  {
+        'Content-Type':   'application/json',
+        'Content-Length': Buffer.byteLength(body),
+        'X-Pet-Token':    secretToken,
+      },
+      timeout: TIMEOUT_MS,
     },
     res => {
-      res.resume()  // 응답 바디 소비 (메모리 누수 방지)
+      res.resume()
       process.exit(0)
     }
   )
 
   req.on('timeout', () => { req.destroy(); process.exit(0) })
-  req.on('error',   () => { process.exit(0) })  // 서버 미실행 시 조용히 종료
+  req.on('error',   () => { process.exit(0) })
   req.write(body)
   req.end()
 }

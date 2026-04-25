@@ -4,8 +4,6 @@
  *
  * Claude Code / Claude Desktop / co-works 등 MCP를 지원하는
  * 모든 Claude 환경에서 펫에 신호를 보낼 수 있도록 합니다.
- *
- * 등록 방법: ~/.claude/settings.json 의 mcpServers에 추가
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js'
@@ -15,9 +13,17 @@ import {
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js'
 import http from 'http'
+import fs   from 'fs'
+import path from 'path'
+import os   from 'os'
 
-const PET_HOST = '127.0.0.1'
-const PET_PORT = 23333
+const PET_HOST   = '127.0.0.1'
+const PET_PORT   = 23333
+const TOKEN_PATH = path.join(os.homedir(), '.cc-monitor-pet.token')
+
+// 인증 토큰 읽기 (앱 미실행 시 빈 문자열)
+let secretToken = ''
+try { secretToken = fs.readFileSync(TOKEN_PATH, 'utf8').trim() } catch {}
 
 // ── MCP 서버 초기화 ──────────────────────────────────────────
 
@@ -72,6 +78,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     return { content: [{ type: 'text', text: `Unknown tool: ${name}` }], isError: true }
   }
 
+  // 토큰이 갱신될 수 있으므로 매 요청마다 재읽기
+  try { secretToken = fs.readFileSync(TOKEN_PATH, 'utf8').trim() } catch {}
+
   const { state, event = 'MCPSignal' } = args
 
   try {
@@ -80,7 +89,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       content: [{ type: 'text', text: `✅ 펫 상태 변경: ${state}` }],
     }
   } catch (err) {
-    // 펫 앱이 실행 중이지 않아도 에러 없이 넘어감
     return {
       content: [{ type: 'text', text: `⚠️ 펫 서버 연결 실패 (앱이 실행 중인지 확인): ${err.message}` }],
     }
@@ -95,12 +103,13 @@ function postToPet(payload) {
     const req = http.request(
       {
         hostname: PET_HOST,
-        port: PET_PORT,
-        path: '/state',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+        port:     PET_PORT,
+        path:     '/state',
+        method:   'POST',
+        headers:  {
+          'Content-Type':   'application/json',
           'Content-Length': Buffer.byteLength(body),
+          'X-Pet-Token':    secretToken,
         },
         timeout: 1000,
       },

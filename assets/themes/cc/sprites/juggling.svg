@@ -1,5 +1,5 @@
 <svg width="360" height="240" viewBox="0 0 360 240"
-  xmlns="http://www.w3.org/2000/svg" aria-label="Juggling">
+  xmlns="http://www.w3.org/2000/svg" aria-label="Storm Typing">
   <defs>
     <filter id="fC" x="-15%" y="-15%" width="130%" height="130%">
       <feGaussianBlur stdDeviation="3"/>
@@ -13,48 +13,126 @@
     <filter id="fF" x="-20%" y="-20%" width="140%" height="140%">
       <feGaussianBlur stdDeviation="0.3"/>
     </filter>
-    <filter id="fH" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="1.5"/>
+    <filter id="fL" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3"/>
     </filter>
   </defs>
   <style>
-  .cloud{animation:float 3.8s ease-in-out infinite}
-  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-  .eye-l,.eye-r{transform-box:fill-box;transform-origin:center;animation:blink 5.2s ease-in-out infinite}
-  @keyframes blink{0%,82%,100%{transform:scaleY(1)}88%{transform:scaleY(.06)}93%{transform:scaleY(1)}}
-  .ba{transform-box:fill-box;transform-origin:center;animation:ba 1.2s ease-in-out infinite}
-  .bb{transform-box:fill-box;transform-origin:center;animation:bb 1.2s ease-in-out infinite .4s}
-  .bc{transform-box:fill-box;transform-origin:center;animation:bc 1.2s ease-in-out infinite .8s}
-  .hjl{transform-box:fill-box;transform-origin:center;animation:hjl 1.2s ease-in-out infinite}
-  .hjr{transform-box:fill-box;transform-origin:center;animation:hjr 1.2s ease-in-out infinite .6s}
-  @keyframes ba{0%,100%{transform:translate(0,0)}50%{transform:translate(52px,-58px)}}
-  @keyframes bb{0%,100%{transform:translate(0,0)}50%{transform:translate(-44px,-62px)}}
-  @keyframes bc{0%,100%{transform:translate(0,0)}50%{transform:translate(10px,-68px)}}
-  @keyframes hjl{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-  @keyframes hjr{0%,100%{transform:translateY(-10px)}50%{transform:translateY(0)}}</style>
+    /* 둥둥 떠다니는 애니메이션 */
+    .cloud { animation: float 3.8s ease-in-out infinite; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+
+    /* 번개 깜빡임 (엇박자) */
+    .b1 { animation: flash 2.4s ease-in-out infinite; }
+    .b2 { animation: flash 2.4s ease-in-out infinite 0.45s; }
+    .b3 { animation: flash 2.4s ease-in-out infinite 0.9s; }
+    @keyframes flash { 0%,35%,55%,100%{opacity:1} 45%{opacity:0.04} }
+
+    /* 키보드 타이핑 (좌우 엇갈리게) */
+    .tl { animation: typel 0.52s ease-in-out infinite; transform-box:fill-box; transform-origin:bottom center; }
+    .tr { animation: typer 0.52s ease-in-out infinite; transform-box:fill-box; transform-origin:bottom center; }
+    @keyframes typel { 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
+    @keyframes typer { 0%,100%{transform:translateY(6px)} 50%{transform:translateY(0)} }
+
+    /* 눈 깜빡임 */
+    .eye-l,.eye-r { transform-box:fill-box; transform-origin:center; animation:blink 5.2s ease-in-out infinite; }
+    @keyframes blink { 0%,82%,100%{transform:scaleY(1)} 88%{transform:scaleY(.06)} 93%{transform:scaleY(1)} }
+  </style>
+
   <g class="cloud">
-  <g filter="url(#fC)">
-    <ellipse cx="180" cy="178" rx="128" ry="43" fill="#FF9A59"/>
-    <circle cx="64"  cy="152" r="34" fill="#FF9A59"/>
-    <circle cx="122" cy="118" r="50" fill="#FF9A59"/>
-    <circle cx="173" cy="87"  r="56" fill="#FF9A59"/>
-    <circle cx="230" cy="111" r="53" fill="#FFA76C"/>
-    <circle cx="293" cy="148" r="37" fill="#FFA76C"/>
-  </g>
-  <g filter="url(#fG)">
-    <ellipse cx="165" cy="96" rx="44" ry="23" fill="#FFCF90" opacity="0.48"/>
-  </g>
-  <g class="hjl" filter="url(#fH)"><circle cx="90" cy="152" r="18" fill="#FFB87A"/></g>
-  <g class="hjr" filter="url(#fH)"><circle cx="270" cy="150" r="18" fill="#FFB87A"/></g>  <g class="ba"><circle cx="90" cy="152" r="10" fill="#FF6BAE" opacity="0.9"/></g>
-  <g class="bb"><circle cx="270" cy="150" r="10" fill="#6BC5FF" opacity="0.9"/></g>
-  <g class="bc"><circle cx="180" cy="128" r="10" fill="#90E070" opacity="0.9"/></g>  <ellipse cx="136" cy="161" rx="24" ry="11" fill="#FF6080" opacity="0.35" filter="url(#fB)"/>
-  <ellipse cx="224" cy="161" rx="24" ry="11" fill="#FF6080" opacity="0.35" filter="url(#fB)"/>  <g filter="url(#fF)">
-    <ellipse cx="150" cy="145" rx="16" ry="19" fill="#1E0A00"/>
-    <ellipse cx="144" cy="138" rx="5.5" ry="6.5" fill="#FFF" opacity="0.95"/>
-    <ellipse cx="210" cy="145" rx="16" ry="19" fill="#1E0A00"/>
-    <ellipse cx="204" cy="138" rx="5.5" ry="6.5" fill="#FFF" opacity="0.95"/>
-  </g>  <g filter="url(#fF)">
-    <path d="M 162 166 Q 180 182 198 166" stroke="#1E0A00" stroke-width="2.8" fill="none" stroke-linecap="round"/>
-  </g>
+
+    <!-- ── 구름 몸체 (색상 동일하게 유지) ── -->
+    <g filter="url(#fC)">
+      <ellipse cx="180" cy="178" rx="128" ry="43" fill="#FF9A59"/>
+      <circle cx="64"  cy="152" r="34" fill="#FF9A59"/>
+      <circle cx="122" cy="118" r="50" fill="#FF9A59"/>
+      <circle cx="173" cy="87"  r="56" fill="#FF9A59"/>
+      <circle cx="230" cy="111" r="53" fill="#FFA76C"/>
+      <circle cx="293" cy="148" r="37" fill="#FFA76C"/>
+    </g>
+    <g filter="url(#fG)">
+      <ellipse cx="165" cy="96" rx="44" ry="23" fill="#FFCF90" opacity="0.48"/>
+    </g>
+
+    <!-- ── 번개 글로우 (머리 위, 블러) ── -->
+    <g class="b1" filter="url(#fL)" opacity="0.42">
+      <path d="M 133 78 L 121 50 L 131 50 L 115 24"
+            stroke="#FFE000" stroke-width="10" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+    </g>
+    <g class="b2" filter="url(#fL)" opacity="0.50">
+      <path d="M 178 58 L 165 28 L 178 28 L 161 4"
+            stroke="#FFE000" stroke-width="13" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+    </g>
+    <g class="b3" filter="url(#fL)" opacity="0.42">
+      <path d="M 222 80 L 235 52 L 224 52 L 240 26"
+            stroke="#FFE000" stroke-width="10" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+    </g>
+
+    <!-- ── 번개 볼트 (선명, 머리 위) ── -->
+    <!-- 왼쪽 -->
+    <g class="b1">
+      <path d="M 133 78 L 121 50 L 131 50 L 115 24"
+            stroke="#FFE000" stroke-width="4.2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M 133 78 L 121 50 L 131 50 L 115 24"
+            stroke="#FFFACC" stroke-width="1.6" fill="none" stroke-linejoin="round" stroke-linecap="round" opacity="0.8"/>
+    </g>
+    <!-- 중앙 (큰 것) -->
+    <g class="b2">
+      <path d="M 178 58 L 165 28 L 178 28 L 161 4"
+            stroke="#FFE000" stroke-width="6" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M 178 58 L 165 28 L 178 28 L 161 4"
+            stroke="#FFFACC" stroke-width="2.2" fill="none" stroke-linejoin="round" stroke-linecap="round" opacity="0.85"/>
+    </g>
+    <!-- 오른쪽 -->
+    <g class="b3">
+      <path d="M 222 80 L 235 52 L 224 52 L 240 26"
+            stroke="#FFE000" stroke-width="4.2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M 222 80 L 235 52 L 224 52 L 240 26"
+            stroke="#FFFACC" stroke-width="1.6" fill="none" stroke-linejoin="round" stroke-linecap="round" opacity="0.8"/>
+    </g>
+
+    <!-- ── 볼 블러쉬 ── -->
+    <ellipse cx="128" cy="161" rx="22" ry="10" fill="#FF6080" opacity="0.28" filter="url(#fB)"/>
+    <ellipse cx="232" cy="161" rx="22" ry="10" fill="#FF6080" opacity="0.28" filter="url(#fB)"/>
+
+    <!-- ── 눈 ── -->
+    <g filter="url(#fF)">
+      <ellipse class="eye-l" cx="150" cy="145" rx="16" ry="19" fill="#1E0A00"/>
+      <ellipse cx="144" cy="138" rx="5.5" ry="6.5" fill="#FFF" opacity="0.95"/>
+      <ellipse class="eye-r" cx="210" cy="145" rx="16" ry="19" fill="#1E0A00"/>
+      <ellipse cx="204" cy="138" rx="5.5" ry="6.5" fill="#FFF" opacity="0.95"/>
+    </g>
+
+    <!-- ── 입 (집중 미소) ── -->
+    <path d="M 162 166 Q 180 180 198 166"
+          stroke="#1E0A00" stroke-width="2.8" fill="none"
+          stroke-linecap="round" filter="url(#fF)"/>
+
+    <!-- ── 키보드 ── -->
+    <rect x="108" y="218" width="144" height="18" rx="5" fill="#FFB87A" opacity="0.88"/>
+    <!-- 키 1행 -->
+    <rect x="114" y="221" width="7" height="5" rx="1.5" fill="#FF9A59"/>
+    <rect x="124" y="221" width="7" height="5" rx="1.5" fill="#FF9A59"/>
+    <rect x="134" y="221" width="7" height="5" rx="1.5" fill="#FF9A59"/>
+    <rect x="144" y="221" width="7" height="5" rx="1.5" fill="#FF9A59"/>
+    <rect x="154" y="221" width="7" height="5" rx="1.5" fill="#FF9A59"/>
+    <rect x="164" y="221" width="7" height="5" rx="1.5" fill="#FF9A59"/>
+    <rect x="174" y="221" width="7" height="5" rx="1.5" fill="#FF9A59"/>
+    <rect x="184" y="221" width="7" height="5" rx="1.5" fill="#FF9A59"/>
+    <rect x="194" y="221" width="7" height="5" rx="1.5" fill="#FF9A59"/>
+    <rect x="204" y="221" width="7" height="5" rx="1.5" fill="#FF9A59"/>
+    <rect x="214" y="221" width="7" height="5" rx="1.5" fill="#FF9A59"/>
+    <rect x="224" y="221" width="7" height="5" rx="1.5" fill="#FF9A59"/>
+    <!-- 스페이스바 -->
+    <rect x="130" y="229" width="100" height="5" rx="2" fill="#FF9A59"/>
+
+    <!-- ── 타이핑 손 ── -->
+    <g class="tl">
+      <ellipse cx="114" cy="212" rx="13" ry="9" fill="#FFB87A" filter="url(#fF)"/>
+    </g>
+    <g class="tr">
+      <ellipse cx="246" cy="212" rx="13" ry="9" fill="#FFB87A" filter="url(#fF)"/>
+    </g>
+
   </g>
 </svg>

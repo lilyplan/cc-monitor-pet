@@ -141,6 +141,41 @@ npm run install-hooks
 
 > 기존 `settings.json`은 `.bak` 파일로 백업됩니다.
 
+## MCP 서버 연결 (선택)
+
+Claude Desktop 또는 Claude Code에서 MCP를 통해 직접 펫 상태를 제어할 수 있습니다.
+
+**Claude Code (`~/.claude/claude.json`)**
+
+```json
+{
+  "mcpServers": {
+    "cc-monitor-pet": {
+      "command": "node",
+      "args": ["/절대경로/cc-monitor-pet/mcp/pet-server.js"]
+    }
+  }
+}
+```
+
+**Claude Desktop (`~/Library/Application Support/Claude/claude_desktop_config.json`)**
+
+```json
+{
+  "mcpServers": {
+    "cc-monitor-pet": {
+      "command": "node",
+      "args": ["/절대경로/cc-monitor-pet/mcp/pet-server.js"]
+    }
+  }
+}
+```
+
+> `/절대경로/cc-monitor-pet`을 실제 경로로 변경하세요. (예: `/Users/yourname/Desktop/cc-monitor-pet`)  
+> 설정 후 앱을 재시작하면 `signal_pet` 도구가 활성화됩니다.
+
+MCP가 연결되면 Claude가 작업 시작/완료/오류 시점에 직접 펫 상태를 변경할 수 있습니다.
+
 ## 훅 제거
 
 ```bash

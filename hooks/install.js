@@ -59,13 +59,29 @@ function run() {
     settings.hooks = {}
   }
 
-  const hookCmd = `node ${HOOK_SCRIPT}`
+  const nodeBin  = process.execPath          // 현재 실행 중인 Node.js 절대 경로
+  const hookCmd = `"${nodeBin}" "${HOOK_SCRIPT}"`
   let addedCount = 0
 
   for (const event of HOOK_EVENTS) {
     if (!Array.isArray(settings.hooks[event])) {
       settings.hooks[event] = []
     }
+
+    // 구버전 'node hook.js' 형태 항목을 새 절대 경로로 교체
+    let upgraded = false
+    for (const entry of settings.hooks[event]) {
+      if (!Array.isArray(entry.hooks)) continue
+      for (const h of entry.hooks) {
+        if (h.type === 'command' && h.command !== hookCmd &&
+            h.command.includes('cc-monitor-pet') && h.command.includes('hook.js')) {
+          h.command = hookCmd
+          upgraded = true
+          addedCount++
+        }
+      }
+    }
+    if (upgraded) continue
 
     // 이미 동일 커맨드가 등록되어 있으면 스킵
     const alreadyRegistered = settings.hooks[event].some(entry =>
@@ -95,6 +111,7 @@ function run() {
 
   fs.writeFileSync(SETTINGS, JSON.stringify(settings, null, 2), 'utf8')
   console.log(`[install] ${addedCount}개 이벤트 훅 등록 완료: ${SETTINGS}`)
+  console.log(`[install] Node.js 경로: ${nodeBin}`)
   console.log(`[install] 훅 스크립트 경로: ${HOOK_SCRIPT}`)
 }
 
