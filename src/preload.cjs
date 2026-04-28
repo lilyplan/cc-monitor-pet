@@ -15,6 +15,9 @@ contextBridge.exposeInMainWorld('pet', {
   openClaude: () => {
     ipcRenderer.send('pet:open-claude')
   },
+  dragStart: (sx, sy) => ipcRenderer.send('pet:drag-start', { sx, sy }),
+  dragMove:  (sx, sy) => ipcRenderer.send('pet:drag-move',  { sx, sy }),
+  dragEnd:   ()       => ipcRenderer.send('pet:drag-end'),
 
   // SVG 파일을 문자열로 반환 (fetch 대신 Node.js fs 사용)
   readSprite: (name) => {

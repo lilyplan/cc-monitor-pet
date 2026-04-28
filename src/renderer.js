@@ -238,12 +238,34 @@
 
   const hitArea = document.getElementById('hit-area')
 
+  // ── 드래그 ──────────────────────────────────────────────────
+  let dragging = false
+
+  hitArea.addEventListener('mousedown', e => {
+    if (e.button !== 0) return
+    dragging = true
+    window.pet?.dragStart(e.screenX, e.screenY)
+    e.preventDefault()
+  })
+
+  window.addEventListener('mousemove', e => {
+    if (!dragging) return
+    window.pet?.dragMove(e.screenX, e.screenY)
+  })
+
+  window.addEventListener('mouseup', e => {
+    if (e.button !== 0 || !dragging) return
+    dragging = false
+    window.pet?.dragEnd()
+  })
+
   hitArea.addEventListener('contextmenu', e => {
     e.preventDefault()
     window.pet?.showContextMenu()
   })
 
   hitArea.addEventListener('click', e => {
+    if (e.detail === 0) return  // drag 후 mouseup이 click으로 오는 경우 무시
     e.preventDefault()
     window.pet?.openClaude()
   })

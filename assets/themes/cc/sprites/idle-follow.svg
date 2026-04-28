@@ -1,5 +1,6 @@
 <svg width="360" height="240" viewBox="0 0 360 240"
-  xmlns="http://www.w3.org/2000/svg" aria-label="Idle Follow">
+  xmlns="http://www.w3.org/2000/svg" aria-label="Idle Follow"
+  style="background: transparent">
   <defs>
     <filter id="fC" x="-15%" y="-15%" width="130%" height="130%">
       <feGaussianBlur stdDeviation="3"/>

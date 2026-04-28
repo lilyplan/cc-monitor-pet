@@ -16,6 +16,8 @@ const TOKEN_PATH = path.join(os.homedir(), '.cc-monitor-pet.token')
 let mainWindow       = null
 let permissionWindow = null
 let prefs            = {}
+let isDragging       = false
+let dragBase         = null   // { winX, winY, screenX, screenY }
 
 // ── 시작 시 랜덤 토큰 생성 (hook.js / MCP 서버가 읽어서 헤더에 포함) ──────
 function generateToken() {
@@ -47,13 +49,16 @@ app.on('window-all-closed', () => {
 
 // ── 펫 창 ────────────────────────────────────────────────────────────────────
 
+function snapToBottom(display) {
+  return display.workArea.y + display.workArea.height - PET_SIZE
+}
+
 function createPetWindow() {
-  const { width: sw, height: wah } = screen.getPrimaryDisplay().workAreaSize
-
   const x = prefs.windowX ?? 20
-  const y = wah - PET_SIZE
+  const display = screen.getDisplayNearestPoint({ x, y: 0 })
+  const y = snapToBottom(display)
 
-  console.log(`[main] 화면: ${sw}x${wah}(workArea), 창: ${x},${y}, 크기: ${PET_SIZE}x${PET_SIZE}`)
+  console.log(`[main] 화면: ${display.bounds.width}x${display.workArea.height}(workArea), 창: ${x},${y}, 크기: ${PET_SIZE}x${PET_SIZE}`)
 
   const win = new BrowserWindow({
     width: PET_SIZE,
@@ -75,13 +80,20 @@ function createPetWindow() {
   })
 
   win.loadFile(path.join(__dirname, 'index.html'))
-  win.setAlwaysOnTop(true, 'screen-saver')
+  win.setAlwaysOnTop(true, 'floating')
   win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
 
-  win.once('ready-to-show', () => { win.show() })
+  win.once('ready-to-show', () => {
+    win.setBackgroundColor('#00000000')
+    win.show()
+  })
 
+  // moved 이벤트는 외부(OS)에서 창이 이동됐을 때만 스냅
   win.on('moved', () => {
-    const [wx] = win.getPosition()
+    if (isDragging) return
+    const [wx, wy] = win.getPosition()
+    const display = screen.getDisplayNearestPoint({ x: wx, y: wy })
+    win.setPosition(wx, snapToBottom(display))
     savePrefs({ ...loadPrefs(), windowX: wx })
   })
 
@@ -223,9 +235,36 @@ ipcMain.on('pet:set-state', (_, state) => {
 ipcMain.on('pet:show-context-menu', (event) => {
   const win = BrowserWindow.fromWebContents(event.sender)
   const menu = Menu.buildFromTemplate([
+    { label: '개발자 도구', click: () => win.webContents.openDevTools({ mode: 'detach' }) },
+    { type: 'separator' },
     { label: '종료', click: () => app.quit() },
   ])
   menu.popup({ window: win })
+})
+
+// ── 드래그 IPC ───────────────────────────────────────────────────────────────
+
+ipcMain.on('pet:drag-start', (_, { sx, sy }) => {
+  isDragging = true
+  const [wx, wy] = mainWindow.getPosition()
+  dragBase = { winX: wx, winY: wy, screenX: sx, screenY: sy }
+})
+
+ipcMain.on('pet:drag-move', (_, { sx, sy }) => {
+  if (!dragBase) return
+  const nx = dragBase.winX + (sx - dragBase.screenX)
+  const ny = dragBase.winY + (sy - dragBase.screenY)
+  mainWindow.setPosition(Math.round(nx), Math.round(ny))
+})
+
+ipcMain.on('pet:drag-end', () => {
+  isDragging = false
+  dragBase = null
+  const [wx, wy] = mainWindow.getPosition()
+  const display = screen.getDisplayNearestPoint({ x: wx, y: wy })
+  const snapY = snapToBottom(display)
+  mainWindow.setPosition(wx, snapY)
+  savePrefs({ ...loadPrefs(), windowX: wx })
 })
 
 ipcMain.on('pet:open-claude', () => {
