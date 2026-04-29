@@ -52,6 +52,10 @@
       gap: 6px;
     }
 
+    .card {
+      -webkit-app-region: no-drag;
+    }
+
     .buttons button {
       flex: 1;
       height: 28px;
@@ -61,6 +65,7 @@
       font-size: 9px;
       font-weight: 600;
       transition: opacity 0.12s, transform 0.1s;
+      -webkit-app-region: no-drag;
     }
 
     .buttons button:hover  { opacity: 0.82; }
@@ -75,9 +80,9 @@
   <div class="card">
     <div class="title" id="title">🔐 권한 요청</div>
     <div class="buttons">
-      <button class="btn-deny"   onclick="decide('deny')">거부</button>
-      <button class="btn-allow"  onclick="decide('allow')">허용</button>
-      <button class="btn-always" onclick="decide('always')">항상 허용</button>
+      <button class="btn-deny"   data-decision="deny">거부</button>
+      <button class="btn-allow"  data-decision="allow">허용</button>
+      <button class="btn-always" data-decision="always">항상 허용</button>
     </div>
   </div>
   <script src="permission.js"></script>

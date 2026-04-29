@@ -1,0 +1,75 @@
+<svg width="360" height="240" viewBox="0 0 360 240"
+  xmlns="http://www.w3.org/2000/svg" aria-label="Cheering">
+  <defs>
+    <filter id="fC" x="-15%" y="-15%" width="130%" height="130%"><feGaussianBlur stdDeviation="3"/></filter>
+    <filter id="fG" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="5"/></filter>
+    <filter id="fB" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="7"/></filter>
+    <filter id="fF" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="0.3"/></filter>
+    <filter id="fH" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.5"/></filter>
+  </defs>
+  <style>
+  /* idle과 동일한 float, blink, hand wave — 바운스만 더 크게 */
+  .cloud{animation:cheer 0.42s ease-in-out infinite alternate}
+  @keyframes cheer{0%{transform:translateY(2px)}100%{transform:translateY(-18px)}}
+  .eye-l,.eye-r{transform-box:fill-box;transform-origin:center;animation:blink 5.2s ease-in-out infinite}
+  @keyframes blink{0%,82%,100%{transform:scaleY(1)}88%{transform:scaleY(.06)}93%{transform:scaleY(1)}}
+  .hand-l{transform-box:fill-box;transform-origin:50% 80%;animation:hl 0.42s ease-in-out infinite alternate}
+  .hand-r{transform-box:fill-box;transform-origin:50% 80%;animation:hr 0.42s ease-in-out infinite alternate}
+  @keyframes hl{0%{transform:rotate(-8deg) translateY(0)}100%{transform:rotate(-22deg) translateY(-8px)}}
+  @keyframes hr{0%{transform:rotate(8deg)  translateY(0)}100%{transform:rotate(22deg)  translateY(-8px)}}
+  .sp{transform-box:fill-box;transform-origin:center;animation:sp 0.78s ease-in-out infinite}
+  .sp:nth-child(1){animation-delay:0s}
+  .sp:nth-child(2){animation-delay:0.13s}
+  .sp:nth-child(3){animation-delay:0.26s}
+  .sp:nth-child(4){animation-delay:0.39s}
+  .sp:nth-child(5){animation-delay:0.52s}
+  .sp:nth-child(6){animation-delay:0.65s}
+  @keyframes sp{0%,100%{opacity:0;transform:scale(0.2) translateY(0)}45%{opacity:1;transform:scale(1.3) translateY(-20px)}70%{opacity:0.6;transform:scale(1.0) translateY(-28px)}}
+  </style>
+
+  <!-- 별빛 스파클 (구름 그룹 밖: 독립 트윙클) -->
+  <g class="sp"><text x="18"  y="102" font-size="22" fill="#FFE000" font-family="Arial" opacity="0.95">✦</text></g>
+  <g class="sp"><text x="316" y="96"  font-size="20" fill="#FFE000" font-family="Arial" opacity="0.95">✦</text></g>
+  <g class="sp"><text x="330" y="130" font-size="15" fill="#FFEE44" font-family="Arial" opacity="0.90">✦</text></g>
+  <g class="sp"><text x="10"  y="136" font-size="15" fill="#FFEE44" font-family="Arial" opacity="0.90">✦</text></g>
+  <g class="sp"><text x="162" y="18"  font-size="30" fill="#FFE000" font-family="Arial" opacity="1.00">✦</text></g>
+  <g class="sp"><text x="108" y="38"  font-size="18" fill="#FFEE44" font-family="Arial" opacity="0.88">✦</text></g>
+
+  <g class="cloud">
+    <!-- idle과 동일한 구름 색상 -->
+    <g filter="url(#fC)">
+      <ellipse cx="180" cy="178" rx="128" ry="43" fill="#FF9A59"/>
+      <circle  cx="64"  cy="152" r="34"          fill="#FF9A59"/>
+      <circle  cx="122" cy="118" r="50"          fill="#FF9A59"/>
+      <circle  cx="173" cy="87"  r="56"          fill="#FF9A59"/>
+      <circle  cx="230" cy="111" r="53"          fill="#FFA76C"/>
+      <circle  cx="293" cy="148" r="37"          fill="#FFA76C"/>
+    </g>
+    <g filter="url(#fG)">
+      <ellipse cx="165" cy="96" rx="44" ry="23" fill="#FFCF90" opacity="0.48"/>
+    </g>
+
+    <!-- 두 손 번쩍 (idle 손 색상 그대로, 위치만 높게) -->
+    <g class="hand-l" filter="url(#fH)"><circle cx="52"  cy="82" r="20" fill="#FFB87A"/></g>
+    <g class="hand-r" filter="url(#fH)"><circle cx="308" cy="78" r="20" fill="#FFB87A"/></g>
+
+    <!-- idle과 동일한 볼 홍조 -->
+    <ellipse cx="136" cy="161" rx="24" ry="11" fill="#FF6080" opacity="0.35" filter="url(#fB)"/>
+    <ellipse cx="224" cy="161" rx="24" ry="11" fill="#FF6080" opacity="0.35" filter="url(#fB)"/>
+
+    <!-- idle과 동일한 눈 (blink 포함) -->
+    <g class="eye-l" filter="url(#fF)"><g>
+      <ellipse cx="150" cy="145" rx="14" ry="16" fill="#1E0A00"/>
+      <ellipse cx="145" cy="139" rx="4.5" ry="5.5" fill="#FFF" opacity="0.92"/>
+    </g></g>
+    <g class="eye-r" filter="url(#fF)"><g>
+      <ellipse cx="210" cy="145" rx="14" ry="16" fill="#1E0A00"/>
+      <ellipse cx="205" cy="139" rx="4.5" ry="5.5" fill="#FFF" opacity="0.92"/>
+    </g></g>
+
+    <!-- idle과 동일한 입 (살짝 웃음) -->
+    <g filter="url(#fF)">
+      <path d="M 168 168 Q 180 178 192 168" stroke="#1E0A00" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    </g>
+  </g>
+</svg>

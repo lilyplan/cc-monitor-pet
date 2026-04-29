@@ -9,22 +9,36 @@
 
   // ── 상태 머신 ─────────────────────────────────────────────────
 
+  // 높은 숫자 = 강함 (error:8 이 최우선)
   const PRIORITY = {
-    sleeping: 0, idle: 1, thinking: 2, working: 3,
+    sleeping: 0, idle: 1,
+    thinking: 2,
+    working: 3, cheering: 3,   // cheering은 ONE_SHOT — WORK_SET이 즉시 취소
     carrying: 4, juggling: 4,
-    attention: 5, sweeping: 6, notification: 7, error: 8,
+    attention: 5, done: 5,     // 완료/주의 알림
+    sweeping: 6,
+    notification: 7,
+    error: 8,
   }
-  const ONE_SHOT   = new Set(['error', 'notification', 'attention', 'sweeping'])
+  const ONE_SHOT   = new Set(['error', 'notification', 'done', 'attention', 'sweeping', 'cheering'])
   const SLEEP_SET  = new Set(['sleeping', 'yawning', 'dozing', 'collapsing'])
 
   let currentState = 'idle'
   let activeStates = {}
   let idleTimer = null, sleepTimer = null, wakeTimer = null, oneShotTimer = null
 
+  const WORK_SET = new Set(['working', 'thinking', 'juggling', 'carrying'])
+
   function requestState(state) {
     if (!(state in PRIORITY)) return
     resetIdleTimers()
     if (!ONE_SHOT.has(state)) activeStates[state] = (activeStates[state] ?? 0) + 1
+
+    // 새 작업이 시작되면 진행 중인 one-shot(notification 등)을 즉시 취소
+    if (WORK_SET.has(state) && ONE_SHOT.has(currentState)) {
+      clearTimeout(oneShotTimer)
+      currentState = 'idle'
+    }
 
     const rp = PRIORITY[state], cp = PRIORITY[currentState] ?? 0
     if (rp === cp) {
@@ -42,7 +56,7 @@
   }
 
   function resolveActive() {
-    let best = 'idle', bestP = PRIORITY['idle']
+    let best = 'idle', bestP = PRIORITY['idle']  // idle=1 이 기본값
     for (const s of Object.keys(activeStates)) {
       const p = PRIORITY[s]
       if (p > bestP || (p === bestP && s === 'juggling')) { best = s; bestP = p }
@@ -69,7 +83,7 @@
 
   const SPRITE_NAMES = [
     'idle', 'idle-follow', 'thinking', 'working', 'juggling',
-    'carrying', 'error', 'notification', 'attention', 'sweeping',
+    'carrying', 'cheering', 'done', 'error', 'notification', 'attention', 'sweeping',
     'yawning', 'dozing', 'collapsing', 'sleeping', 'waking',
   ]
   const SPRITES = {}
@@ -182,10 +196,11 @@
     console.log(`[renderer] sprite → ${state}`)
 
     // ONE_SHOT 상태 자동 idle 복귀
-    // notification: 점프 3초 + 대기 20초 = 23초 후 복귀
-    // 그 외: 3초 후 복귀
+    // notification: 13초 / done: 8초 / cheering: 3초 / 그 외: 3초
     if (ONE_SHOT.has(state)) {
-      const delay = state === 'notification' ? 13000 : 3000
+      const delay = state === 'notification' ? 13000
+                  : state === 'done'         ? 8000
+                  : 3000
       oneShotTimer = setTimeout(() => {
         if (ONE_SHOT.has(currentState)) {
           activeStates = {}
