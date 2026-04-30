@@ -73,7 +73,7 @@
 
     .btn-deny   { background: #D0D0D0; color: #444; }
     .btn-allow  { background: #E8735A; color: #fff; }
-    .btn-always { background: #D45F44; color: #fff; }
+    .btn-always { background: #D45F44; color: #fff; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   </style>
 </head>
 <body>
@@ -82,7 +82,7 @@
     <div class="buttons">
       <button class="btn-deny"   data-decision="deny">거부</button>
       <button class="btn-allow"  data-decision="allow">허용</button>
-      <button class="btn-always" data-decision="always">항상 허용</button>
+      <button class="btn-always" data-decision="always" id="btn-always">항상 허용</button>
     </div>
   </div>
   <script src="permission.js"></script>

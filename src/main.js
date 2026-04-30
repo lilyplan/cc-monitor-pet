@@ -34,7 +34,6 @@ app.whenReady().then(async () => {
   mainWindow = createPetWindow()
   const result = createServer(mainWindow, {
     secretToken,
-    isAlwaysAllowed:      (toolName) => (loadPrefs().alwaysAllowed ?? []).includes(toolName),
     onPermissionNeeded:   showPermissionWindow,
     onPermissionResolved: closePermissionWindow,
   })
@@ -86,7 +85,7 @@ function createPetWindow() {
   win.once('ready-to-show', () => {
     win.setBackgroundColor('#00000000')
     win.show()
-    setTimeout(() => win.webContents.openDevTools({ mode: 'detach' }), 1000)
+
   })
 
   // moved 이벤트는 외부(OS)에서 창이 이동됐을 때만 스냅
@@ -143,12 +142,16 @@ function showPermissionWindow(toolInfo) {
   })
 
   permissionWindow.loadFile(path.join(__dirname, 'permission.html'))
-  permissionWindow.setAlwaysOnTop(true, 'floating')
+  permissionWindow.setAlwaysOnTop(true, 'screen-saver')
   permissionWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
 
-  permissionWindow.webContents.on('did-finish-load', () => {
-    permissionWindow.webContents.send('perm:data', toolInfo)
-    permissionWindow.show()
+  permissionWindow.once('ready-to-show', () => {
+    if (permissionWindow && !permissionWindow.isDestroyed()) {
+      permissionWindow.webContents.send('perm:data', toolInfo)
+      permissionWindow.showInactive()
+      permissionWindow.setAlwaysOnTop(true, 'screen-saver')
+      permissionWindow.moveTop()
+    }
   })
 
   permissionWindow.on('closed', () => { permissionWindow = null })
@@ -163,20 +166,11 @@ function closePermissionWindow() {
 
 // ── Permission 결정 처리 ──────────────────────────────────────────────────
 
-ipcMain.on('perm:decide', (_, { decision, toolName, sessionId }) => {
+ipcMain.on('perm:decide', (_, { decision, toolName, sessionId, suggestion }) => {
   console.log(`[main] perm:decide: ${decision} / ${toolName} / session=${sessionId}`)
-
-  if (decision === 'always') {
-    const p = loadPrefs()
-    const list = p.alwaysAllowed ?? []
-    if (toolName && !list.includes(toolName)) {
-      savePrefs({ ...p, alwaysAllowed: [...list, toolName] })
-      console.log(`[main] 항상 허용 추가: ${toolName}`)
-    }
-  }
-
-  // hook.js의 /permission long-poll에 응답 → Claude Code가 allow/block 수신
-  resolvePermission?.(sessionId, decision)
+  // suggestion: "항상 허용" 클릭 시 popup에서 전달, server.js → CC의 updatedPermissions로 전달
+  // → CC가 직접 ~/.claude/settings.json에 기록 (우리 앱에서 별도 관리 불필요)
+  resolvePermission?.(sessionId, decision, suggestion ?? null)
   closePermissionWindow()
 })
 

@@ -33,61 +33,8 @@ process.stdin.on('data', chunk => {
 process.stdin.on('end', () => {
   let payload
   try { payload = JSON.parse(raw) } catch { process.exit(0) }
-
-  const event = payload.hook_event_name ?? payload.event
-
-  if (event === 'PreToolUse') {
-    requestPermission(payload)
-  } else {
-    sendToServer(payload)
-  }
+  sendToServer(payload)
 })
-
-// PreToolUse: 서버가 Allow/Block 결정을 내릴 때까지 대기 (long-poll)
-function requestPermission(payload) {
-  const body = JSON.stringify({
-    event:     'PreToolUse',
-    sessionId: payload.session_id,
-    cwd:       payload.cwd,
-    toolName:  payload.tool_name,
-    toolInput: payload.tool_input,
-  })
-
-  const req = http.request({
-    hostname: SERVER_HOST,
-    port:     SERVER_PORT,
-    path:     '/permission',
-    method:   'POST',
-    headers: {
-      'Content-Type':   'application/json',
-      'Content-Length': Buffer.byteLength(body),
-      'X-Pet-Token':    secretToken,
-    },
-    timeout: PERM_TIMEOUT_MS,
-  }, res => {
-    let data = ''
-    res.on('data', chunk => { data += chunk })
-    res.on('end', () => {
-      try {
-        const result = JSON.parse(data)
-        if (result.decision === 'block') {
-          // Claude Code에 block 전달 (stdout JSON)
-          process.stdout.write(JSON.stringify({
-            decision: 'block',
-            reason:   result.reason ?? '거부됨',
-          }))
-        }
-        // allow: 아무것도 출력하지 않고 exit 0
-      } catch {}
-      process.exit(0)
-    })
-  })
-
-  req.on('timeout', () => { req.destroy(); process.exit(0) })
-  req.on('error',   () => process.exit(0))   // 서버 미실행 시 그냥 허용
-  req.write(body)
-  req.end()
-}
 
 // 그 외 이벤트: fire-and-forget
 function sendToServer(payload) {
