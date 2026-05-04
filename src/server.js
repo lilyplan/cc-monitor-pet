@@ -101,11 +101,12 @@ export function createServer(mainWindow, callbacks = {}) {
         callbacks.onPermissionNeeded?.({ toolName, toolInput, sessionId, suggestions: rawSuggestions })
         pendingPermissions.set(sessionId, { res, toolName, toolInput, suggestions: rawSuggestions })
 
-        // CC(hook)가 연결을 끊으면 cleanup
+        // CC(hook)가 연결을 끊으면 cleanup (응답 전에 끊긴 경우만 해당)
         req.on('close', () => {
           if (pendingPermissions.has(sessionId)) {
             console.log(`[server] hook 연결 끊김 — cleanup (session=${sessionId})`)
             pendingPermissions.delete(sessionId)
+            callbacks.onPermissionResolved?.()   // 팝업도 함께 닫기
           }
         })
       })

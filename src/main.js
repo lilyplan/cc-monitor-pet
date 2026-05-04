@@ -148,7 +148,7 @@ function showPermissionWindow(toolInfo) {
   permissionWindow.once('ready-to-show', () => {
     if (permissionWindow && !permissionWindow.isDestroyed()) {
       permissionWindow.webContents.send('perm:data', toolInfo)
-      permissionWindow.showInactive()
+      permissionWindow.show()           // showInactive → show: 첫 클릭이 버튼에 직접 전달
       permissionWindow.setAlwaysOnTop(true, 'screen-saver')
       permissionWindow.moveTop()
     }
