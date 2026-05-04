@@ -109,7 +109,7 @@ function showPermissionWindow(toolInfo) {
     return
   }
 
-  const popW = 200, popH = 62
+  const popW = 280, popH = 62
   const petX = (loadPrefs().windowX ?? 20)
 
   // 펫이 있는 모니터 기준으로 팝업 위치 계산

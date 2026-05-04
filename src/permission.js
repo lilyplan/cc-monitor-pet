@@ -11,8 +11,8 @@ window.perm.onData((data) => {
   const alwaysBtn = document.getElementById('btn-always')
   const suggestion = (data.suggestions ?? [])[0]
   if (suggestion?.type === 'addRules' && suggestion.rules?.[0]?.ruleContent) {
-    alwaysBtn.textContent = `항상 허용 \`${suggestion.rules[0].ruleContent}\``
-    alwaysBtn.title = `규칙 추가: ${suggestion.rules[0].ruleContent}`
+    alwaysBtn.textContent = `항상 \`${suggestion.rules[0].ruleContent}\``
+    alwaysBtn.title = `항상 허용: ${suggestion.rules[0].ruleContent}`
   } else {
     alwaysBtn.textContent = '항상 허용'
     alwaysBtn.title = ''
