@@ -11,29 +11,42 @@
       <feGaussianBlur stdDeviation="5"/>
     </filter>
     <filter id="fShadow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="12"/>
+      <feGaussianBlur stdDeviation="10"/>
     </filter>
+
+    <!-- macOS-style G2 continuous squircle path (Big Sur+ shape).
+         Cubic-bezier with control points further inside than a plain rounded rect,
+         giving the smooth corner-to-edge transition Apple uses. -->
+    <clipPath id="squircle">
+      <path d="M512,0
+        C159.108,0 0,159.108 0,512
+        C0,864.892 159.108,1024 512,1024
+        C864.892,1024 1024,864.892 1024,512
+        C1024,159.108 864.892,0 512,0 Z"/>
+    </clipPath>
   </defs>
 
-  <!-- macOS-style squircle: more rounded corners (rx=280, ~27%) -->
-  <rect width="1024" height="1024" rx="280" ry="280" fill="url(#bg)"/>
+  <!-- Background — fill via squircle clip so the silhouette matches macOS apps -->
+  <g clip-path="url(#squircle)">
+    <rect width="1024" height="1024" fill="url(#bg)"/>
 
-  <!-- Soft ground shadow under cloud -->
-  <ellipse cx="512" cy="700" rx="190" ry="22" fill="#000" opacity="0.09" filter="url(#fShadow)"/>
+    <!-- Soft ground shadow under cloud -->
+    <ellipse cx="512" cy="660" rx="160" ry="18" fill="#000" opacity="0.10" filter="url(#fShadow)"/>
 
-  <!-- Minimal cloud — smaller content area for proper macOS-app padding.
-       560x480 centered: starts at x=232, y=272 -->
-  <svg x="232" y="272" width="560" height="480" viewBox="20 30 320 200" preserveAspectRatio="xMidYMid meet">
-    <g filter="url(#fCloud)">
-      <ellipse cx="180" cy="178" rx="128" ry="43" fill="#FF9A59"/>
-      <circle cx="64"  cy="152" r="34" fill="#FF9A59"/>
-      <circle cx="122" cy="118" r="50" fill="#FF9A59"/>
-      <circle cx="173" cy="87"  r="56" fill="#FF9A59"/>
-      <circle cx="230" cy="111" r="53" fill="#FFA76C"/>
-      <circle cx="293" cy="148" r="37" fill="#FFA76C"/>
-    </g>
-    <g filter="url(#fGlow)">
-      <ellipse cx="165" cy="96" rx="44" ry="23" fill="#FFCF90" opacity="0.55"/>
-    </g>
-  </svg>
+    <!-- Minimal cloud — further reduced (440x380) for proper macOS-app padding.
+         Centered horizontally; vertically slightly above middle (~y=320) -->
+    <svg x="292" y="320" width="440" height="380" viewBox="20 30 320 200" preserveAspectRatio="xMidYMid meet">
+      <g filter="url(#fCloud)">
+        <ellipse cx="180" cy="178" rx="128" ry="43" fill="#FF9A59"/>
+        <circle cx="64"  cy="152" r="34" fill="#FF9A59"/>
+        <circle cx="122" cy="118" r="50" fill="#FF9A59"/>
+        <circle cx="173" cy="87"  r="56" fill="#FF9A59"/>
+        <circle cx="230" cy="111" r="53" fill="#FFA76C"/>
+        <circle cx="293" cy="148" r="37" fill="#FFA76C"/>
+      </g>
+      <g filter="url(#fGlow)">
+        <ellipse cx="165" cy="96" rx="44" ry="23" fill="#FFCF90" opacity="0.55"/>
+      </g>
+    </svg>
+  </g>
 </svg>
