@@ -1,8 +1,8 @@
 <svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" aria-label="CC Monitor Pet">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%"  stop-color="#FFF1DC"/>
-      <stop offset="100%" stop-color="#FFD9B0"/>
+      <stop offset="0%"  stop-color="#FFFCF5"/>
+      <stop offset="100%" stop-color="#FFEFD8"/>
     </linearGradient>
     <filter id="fCloud" x="-15%" y="-15%" width="130%" height="130%">
       <feGaussianBlur stdDeviation="3"/>
@@ -10,20 +10,20 @@
     <filter id="fGlow" x="-60%" y="-60%" width="220%" height="220%">
       <feGaussianBlur stdDeviation="5"/>
     </filter>
-    <filter id="fShadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="14"/>
+    <filter id="fShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="12"/>
     </filter>
   </defs>
 
-  <!-- Squircle background with subtle gradient -->
-  <rect width="1024" height="1024" rx="224" ry="224" fill="url(#bg)"/>
+  <!-- macOS-style squircle: more rounded corners (rx=280, ~27%) -->
+  <rect width="1024" height="1024" rx="280" ry="280" fill="url(#bg)"/>
 
-  <!-- Soft ground shadow for depth -->
-  <ellipse cx="512" cy="830" rx="260" ry="30" fill="#000" opacity="0.10" filter="url(#fShadow)"/>
+  <!-- Soft ground shadow under cloud -->
+  <ellipse cx="512" cy="700" rx="190" ry="22" fill="#000" opacity="0.09" filter="url(#fShadow)"/>
 
-  <!-- Minimal cloud silhouette — face details and hands removed for simplicity.
-       Cloud shape taken from idle sprite, scaled and centered. -->
-  <svg x="152" y="180" width="720" height="640" viewBox="20 30 320 200" preserveAspectRatio="xMidYMid meet">
+  <!-- Minimal cloud — smaller content area for proper macOS-app padding.
+       560x480 centered: starts at x=232, y=272 -->
+  <svg x="232" y="272" width="560" height="480" viewBox="20 30 320 200" preserveAspectRatio="xMidYMid meet">
     <g filter="url(#fCloud)">
       <ellipse cx="180" cy="178" rx="128" ry="43" fill="#FF9A59"/>
       <circle cx="64"  cy="152" r="34" fill="#FF9A59"/>
