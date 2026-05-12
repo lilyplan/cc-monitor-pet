@@ -1,0 +1,39 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" aria-label="CC Monitor Pet">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#FFF1DC"/>
+      <stop offset="100%" stop-color="#FFD9B0"/>
+    </linearGradient>
+    <filter id="fCloud" x="-15%" y="-15%" width="130%" height="130%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <filter id="fGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="5"/>
+    </filter>
+    <filter id="fShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+  </defs>
+
+  <!-- Squircle background with subtle gradient -->
+  <rect width="1024" height="1024" rx="224" ry="224" fill="url(#bg)"/>
+
+  <!-- Soft ground shadow for depth -->
+  <ellipse cx="512" cy="830" rx="260" ry="30" fill="#000" opacity="0.10" filter="url(#fShadow)"/>
+
+  <!-- Minimal cloud silhouette — face details and hands removed for simplicity.
+       Cloud shape taken from idle sprite, scaled and centered. -->
+  <svg x="152" y="180" width="720" height="640" viewBox="20 30 320 200" preserveAspectRatio="xMidYMid meet">
+    <g filter="url(#fCloud)">
+      <ellipse cx="180" cy="178" rx="128" ry="43" fill="#FF9A59"/>
+      <circle cx="64"  cy="152" r="34" fill="#FF9A59"/>
+      <circle cx="122" cy="118" r="50" fill="#FF9A59"/>
+      <circle cx="173" cy="87"  r="56" fill="#FF9A59"/>
+      <circle cx="230" cy="111" r="53" fill="#FFA76C"/>
+      <circle cx="293" cy="148" r="37" fill="#FFA76C"/>
+    </g>
+    <g filter="url(#fGlow)">
+      <ellipse cx="165" cy="96" rx="44" ry="23" fill="#FFCF90" opacity="0.55"/>
+    </g>
+  </svg>
+</svg>
