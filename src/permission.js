@@ -22,18 +22,26 @@ window.perm.onData((data) => {
 document.querySelectorAll('[data-decision]').forEach(btn => {
   btn.addEventListener('click', () => {
     const decision = btn.dataset.decision
-    console.log('[perm] 버튼 클릭:', decision, '/ toolName:', currentData.toolName)
-
-    // "항상 허용": CC의 suggestion을 그대로 전달 (없으면 null → server.js가 폴백 생성)
     const suggestion = decision === 'always'
       ? ((currentData.suggestions ?? [])[0] ?? null)
       : null
 
-    window.perm.decide({
+    const payload = {
       decision,
       toolName: currentData.toolName,
       sessionId: currentData.sessionId,
       suggestion,
-    })
+    }
+    console.log('[perm] 버튼 클릭:', payload)
+
+    if (!window.perm?.decide) {
+      console.error('[perm] window.perm.decide 없음 — preload 미연결')
+      return
+    }
+    try {
+      window.perm.decide(payload)
+    } catch (err) {
+      console.error('[perm] decide IPC 전송 실패:', err)
+    }
   })
 })

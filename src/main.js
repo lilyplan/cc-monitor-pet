@@ -92,9 +92,15 @@ app.on('window-all-closed', () => {
 })
 
 // ── IPC: permission decision ─────────────────────────────────
-ipcMain.on('perm:decide', (_, { decision, toolName, sessionId, suggestion }) => {
+ipcMain.on('perm:decide', (_, payload) => {
+  const { decision, toolName, sessionId, suggestion } = payload ?? {}
   console.log(`[main] perm:decide: ${decision} / ${toolName} / session=${sessionId}`)
-  resolvePermission?.(sessionId, decision, suggestion ?? null)
+  if (!resolvePermission) {
+    console.error('[main] perm:decide 수신했지만 resolvePermission 미설정 — 서버 초기화 실패?')
+    permissionController?.close()
+    return
+  }
+  resolvePermission(sessionId, decision, suggestion ?? null)
   permissionController?.close()
 })
 

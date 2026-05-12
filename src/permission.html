@@ -73,7 +73,9 @@
 
     .btn-deny   { background: #D0D0D0; color: #444; flex: none; width: 42px; }
     .btn-allow  { background: #E8735A; color: #fff; flex: none; width: 42px; }
-    .btn-always { background: #D45F44; color: #fff; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    /* min-width: 0 — without this, the flex item refuses to shrink below
+       its content width (default min-width: auto) so text-overflow never kicks in. */
+    .btn-always { background: #D45F44; color: #fff; flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   </style>
 </head>
 <body>

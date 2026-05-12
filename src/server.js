@@ -27,25 +27,30 @@ export function createServer(mainWindow, {
   function resolvePermission(sessionId, decision, suggestion = null) {
     const entry = pending.get(sessionId)
     if (!entry) {
-      console.warn(`[server] resolvePermission: pending 없음 (session=${sessionId})`)
+      console.warn(`[server] resolvePermission: pending 없음 (session=${sessionId}) — 이미 응답됐거나 timeout`)
       return
     }
     pending.delete(sessionId)
     onPermissionResolved?.()
 
+    const body = decision === 'allow' || decision === 'always'
+      ? { behavior: 'allow' }
+      : { behavior: 'deny', message: '사용자가 거부했습니다' }
+
+    if (decision === 'always') {
+      body.updatedPermissions = [suggestion ?? buildFallbackSuggestion(entry.toolName, entry.toolInput)]
+    }
+
     if (decision === 'allow' || decision === 'always') {
-      console.log(`[server] permission → allow (session=${sessionId})`)
       sendState('working', 'PermissionApproved', sessionId)
-      const body = { behavior: 'allow' }
-      if (decision === 'always') {
-        body.updatedPermissions = [suggestion ?? buildFallbackSuggestion(entry.toolName, entry.toolInput)]
-      }
+    }
+
+    try {
       entry.res.writeHead(200)
       entry.res.end(JSON.stringify(body))
-    } else {
-      console.log(`[server] permission → deny (session=${sessionId})`)
-      entry.res.writeHead(200)
-      entry.res.end(JSON.stringify({ behavior: 'deny', message: '사용자가 거부했습니다' }))
+      console.log(`[server] permission → ${body.behavior} (session=${sessionId}, decision=${decision})`)
+    } catch (err) {
+      console.error(`[server] 응답 송신 실패 (session=${sessionId}):`, err.message)
     }
   }
 
