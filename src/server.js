@@ -33,24 +33,61 @@ export function createServer(mainWindow, {
     pending.delete(sessionId)
     onPermissionResolved?.()
 
+    const heldMs = Date.now() - entry.receivedAt
+    console.log(`[server] resolvePermission (session=${sessionId}, decision=${decision}, held=${heldMs}ms)`)
+
     const body = decision === 'allow' || decision === 'always'
       ? { behavior: 'allow' }
       : { behavior: 'deny', message: '사용자가 거부했습니다' }
-
     if (decision === 'always') {
       body.updatedPermissions = [suggestion ?? buildFallbackSuggestion(entry.toolName, entry.toolInput)]
     }
-
     if (decision === 'allow' || decision === 'always') {
       sendState('working', 'PermissionApproved', sessionId)
     }
 
+    const json = JSON.stringify(body)
+    const res = entry.res
+    const sock = res.socket
+    console.log(`[server] 응답 전 상태:`, JSON.stringify({
+      headersSent: res.headersSent,
+      writableEnded: res.writableEnded,
+      destroyed: res.destroyed,
+      socket: sock ? {
+        destroyed: sock.destroyed,
+        writable: sock.writable,
+        readable: sock.readable,
+        bytesWritten: sock.bytesWritten,
+      } : null,
+    }))
+    console.log(`[server] 응답 본문 (${Buffer.byteLength(json)}B):`, json)
+
+    if (res.headersSent || res.writableEnded || res.destroyed) {
+      console.error(`[server] 응답 송신 불가 — res 이미 종료/소멸 (session=${sessionId})`)
+      return
+    }
+    if (sock && (sock.destroyed || !sock.writable)) {
+      console.error(`[server] 응답 송신 불가 — socket already dead (session=${sessionId})`)
+      return
+    }
+
     try {
-      entry.res.writeHead(200)
-      entry.res.end(JSON.stringify(body))
+      res.writeHead(200, {
+        'Content-Type':   'application/json',
+        'Content-Length': Buffer.byteLength(json),
+        'Connection':     'close',
+      })
+      res.end(json, () => {
+        console.log(`[server] res.end callback — 응답 flush 완료 (session=${sessionId})`)
+      })
+      const after = res.socket
+      console.log(`[server] 응답 송신 직후 상태:`, JSON.stringify({
+        writableEnded: res.writableEnded,
+        bytesWritten: after?.bytesWritten ?? null,
+      }))
       console.log(`[server] permission → ${body.behavior} (session=${sessionId}, decision=${decision})`)
     } catch (err) {
-      console.error(`[server] 응답 송신 실패 (session=${sessionId}):`, err.message)
+      console.error(`[server] 응답 송신 실패 (session=${sessionId}):`, err.message, err.stack)
     }
   }
 
@@ -100,7 +137,7 @@ export function createServer(mainWindow, {
 
     sendState('notification', 'PermissionWait', sessionId)
     onPermissionNeeded?.({ toolName, toolInput, sessionId, suggestions })
-    pending.set(sessionId, { res, toolName, toolInput, suggestions })
+    pending.set(sessionId, { res, toolName, toolInput, suggestions, receivedAt: Date.now() })
 
     // If CC drops the connection before we answer, clean up.
     res.req.on('close', () => {
