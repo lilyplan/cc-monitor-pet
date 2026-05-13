@@ -14,36 +14,36 @@
       <feGaussianBlur stdDeviation="14"/>
     </filter>
 
-    <!-- macOS HIG-style rounded rectangle (rx ≈ 22% of canvas).
-         Closer to the Notes / Excel app shape than a superellipse. -->
+    <!-- macOS HIG-style rounded rectangle (rx ≈ 22%) -->
     <clipPath id="squircle">
       <rect width="1024" height="1024" rx="225" ry="225"/>
     </clipPath>
   </defs>
 
-  <g clip-path="url(#squircle)">
-    <!-- Background -->
-    <rect width="1024" height="1024" fill="url(#bg)"/>
+  <!-- Shrink the whole composition (box + cloud + shadow) to 80% of the canvas,
+       centered. Outer canvas stays 1024 so .icns sizing is preserved, the inner
+       artwork fits within ~819px square. -->
+  <g transform="translate(102.4 102.4) scale(0.8)">
+    <g clip-path="url(#squircle)">
+      <rect width="1024" height="1024" fill="url(#bg)"/>
 
-    <!-- Soft ground shadow under cloud (scaled up to match larger character) -->
-    <ellipse cx="512" cy="830" rx="280" ry="26" fill="#000" opacity="0.10" filter="url(#fShadow)"/>
+      <!-- Soft ground shadow -->
+      <ellipse cx="512" cy="830" rx="280" ry="26" fill="#000" opacity="0.10" filter="url(#fShadow)"/>
 
-    <!-- Cloud — doubled in size (was 440x380 → now 880x... with auto height).
-         viewBox kept at 320x200; width 880 ⇒ rendered height 550 (preserveAspectRatio meet).
-         Vertical centering: y = (1024 - 550) / 2 = 237, but lifted slightly to 200 so the
-         soft shadow has room below the cloud. -->
-    <svg x="72" y="200" width="880" height="600" viewBox="20 30 320 200" preserveAspectRatio="xMidYMid meet">
-      <g filter="url(#fCloud)">
-        <ellipse cx="180" cy="178" rx="128" ry="43" fill="#FF9A59"/>
-        <circle cx="64"  cy="152" r="34" fill="#FF9A59"/>
-        <circle cx="122" cy="118" r="50" fill="#FF9A59"/>
-        <circle cx="173" cy="87"  r="56" fill="#FF9A59"/>
-        <circle cx="230" cy="111" r="53" fill="#FFA76C"/>
-        <circle cx="293" cy="148" r="37" fill="#FFA76C"/>
-      </g>
-      <g filter="url(#fGlow)">
-        <ellipse cx="165" cy="96" rx="44" ry="23" fill="#FFCF90" opacity="0.55"/>
-      </g>
-    </svg>
+      <!-- Cloud — internal layout untouched; scaling handled by the outer group. -->
+      <svg x="72" y="200" width="880" height="600" viewBox="20 30 320 200" preserveAspectRatio="xMidYMid meet">
+        <g filter="url(#fCloud)">
+          <ellipse cx="180" cy="178" rx="128" ry="43" fill="#FF9A59"/>
+          <circle cx="64"  cy="152" r="34" fill="#FF9A59"/>
+          <circle cx="122" cy="118" r="50" fill="#FF9A59"/>
+          <circle cx="173" cy="87"  r="56" fill="#FF9A59"/>
+          <circle cx="230" cy="111" r="53" fill="#FFA76C"/>
+          <circle cx="293" cy="148" r="37" fill="#FFA76C"/>
+        </g>
+        <g filter="url(#fGlow)">
+          <ellipse cx="165" cy="96" rx="44" ry="23" fill="#FFCF90" opacity="0.55"/>
+        </g>
+      </svg>
+    </g>
   </g>
 </svg>
