@@ -11,31 +11,28 @@
       <feGaussianBlur stdDeviation="5"/>
     </filter>
     <filter id="fShadow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="10"/>
+      <feGaussianBlur stdDeviation="14"/>
     </filter>
 
-    <!-- macOS-style G2 continuous squircle path (Big Sur+ shape).
-         Cubic-bezier with control points further inside than a plain rounded rect,
-         giving the smooth corner-to-edge transition Apple uses. -->
+    <!-- macOS HIG-style rounded rectangle (rx ≈ 22% of canvas).
+         Closer to the Notes / Excel app shape than a superellipse. -->
     <clipPath id="squircle">
-      <path d="M512,0
-        C159.108,0 0,159.108 0,512
-        C0,864.892 159.108,1024 512,1024
-        C864.892,1024 1024,864.892 1024,512
-        C1024,159.108 864.892,0 512,0 Z"/>
+      <rect width="1024" height="1024" rx="225" ry="225"/>
     </clipPath>
   </defs>
 
-  <!-- Background — fill via squircle clip so the silhouette matches macOS apps -->
   <g clip-path="url(#squircle)">
+    <!-- Background -->
     <rect width="1024" height="1024" fill="url(#bg)"/>
 
-    <!-- Soft ground shadow under cloud -->
-    <ellipse cx="512" cy="660" rx="160" ry="18" fill="#000" opacity="0.10" filter="url(#fShadow)"/>
+    <!-- Soft ground shadow under cloud (scaled up to match larger character) -->
+    <ellipse cx="512" cy="830" rx="280" ry="26" fill="#000" opacity="0.10" filter="url(#fShadow)"/>
 
-    <!-- Minimal cloud — further reduced (440x380) for proper macOS-app padding.
-         Centered horizontally; vertically slightly above middle (~y=320) -->
-    <svg x="292" y="320" width="440" height="380" viewBox="20 30 320 200" preserveAspectRatio="xMidYMid meet">
+    <!-- Cloud — doubled in size (was 440x380 → now 880x... with auto height).
+         viewBox kept at 320x200; width 880 ⇒ rendered height 550 (preserveAspectRatio meet).
+         Vertical centering: y = (1024 - 550) / 2 = 237, but lifted slightly to 200 so the
+         soft shadow has room below the cloud. -->
+    <svg x="72" y="200" width="880" height="600" viewBox="20 30 320 200" preserveAspectRatio="xMidYMid meet">
       <g filter="url(#fCloud)">
         <ellipse cx="180" cy="178" rx="128" ry="43" fill="#FF9A59"/>
         <circle cx="64"  cy="152" r="34" fill="#FF9A59"/>
