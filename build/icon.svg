@@ -30,8 +30,9 @@
       <!-- Soft ground shadow -->
       <ellipse cx="512" cy="830" rx="280" ry="26" fill="#000" opacity="0.10" filter="url(#fShadow)"/>
 
-      <!-- Cloud — internal layout untouched; scaling handled by the outer group. -->
-      <svg x="72" y="200" width="880" height="600" viewBox="20 30 320 200" preserveAspectRatio="xMidYMid meet">
+      <!-- Cloud — additional 20% shrink relative to the box (880→704, 600→480),
+           kept centered on the box. Internal layout untouched. -->
+      <svg x="160" y="260" width="704" height="480" viewBox="20 30 320 200" preserveAspectRatio="xMidYMid meet">
         <g filter="url(#fCloud)">
           <ellipse cx="180" cy="178" rx="128" ry="43" fill="#FF9A59"/>
           <circle cx="64"  cy="152" r="34" fill="#FF9A59"/>
