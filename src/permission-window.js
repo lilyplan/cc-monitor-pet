@@ -11,6 +11,10 @@ const PET_VISIBLE_HEIGHT = 96
 const POPUP_GAP = 5
 const SCREEN_MARGIN = 10
 
+// TEMP: open DevTools alongside every permission popup so we can watch the
+// renderer console while diagnosing the IPC chain. Flip to false once fixed.
+const DEBUG_DEVTOOLS = true
+
 /**
  * Manages the floating permission bubble window. Owns its own state
  * (one window at a time, recreated when needed).
@@ -30,13 +34,16 @@ export function createPermissionWindowController({ getPetPosition }) {
   }
 
   function show(toolInfo) {
+    console.log(`[perm-window] show — tool=${toolInfo.toolName} session=${toolInfo.sessionId}`)
     if (win && !win.isDestroyed()) {
+      console.log('[perm-window] 기존 창 재사용')
       win.webContents.send('perm:data', toolInfo)
       win.show()
       return
     }
 
     const { x, y } = locate()
+    console.log(`[perm-window] 새 창 생성 — pos=(${x},${y})`)
     win = new BrowserWindow({
       width: POPUP_WIDTH,
       height: POPUP_HEIGHT,
@@ -61,13 +68,32 @@ export function createPermissionWindowController({ getPetPosition }) {
 
     win.once('ready-to-show', () => {
       if (!win || win.isDestroyed()) return
+      console.log('[perm-window] ready-to-show')
       win.webContents.send('perm:data', toolInfo)
       win.show()
       win.setAlwaysOnTop(true, 'screen-saver')
       win.moveTop()
+      if (DEBUG_DEVTOOLS) {
+        try { win.webContents.openDevTools({ mode: 'detach' }) } catch (e) {
+          console.error('[perm-window] openDevTools 실패', e)
+        }
+      }
     })
 
-    win.on('closed', () => { win = null })
+    win.webContents.on('did-finish-load', () => {
+      console.log('[perm-window] did-finish-load')
+    })
+    win.webContents.on('render-process-gone', (_, details) => {
+      console.error('[perm-window] render-process-gone', details)
+    })
+    win.webContents.on('preload-error', (_, preloadPath, error) => {
+      console.error('[perm-window] preload-error', preloadPath, error?.message)
+    })
+
+    win.on('closed', () => {
+      console.log('[perm-window] window closed')
+      win = null
+    })
   }
 
   function close() {

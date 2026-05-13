@@ -7,6 +7,12 @@ import { createServer } from './server.js'
 import { loadPrefs, savePrefs } from './prefs.js'
 import { createPermissionWindowController } from './permission-window.js'
 import { PET_SIZE, TOKEN_PATH } from './lib/constants.js'
+import { enableFileLogging, logPath } from './lib/logger.js'
+
+// File logging is enabled unconditionally for the debug build; remove this
+// line (or guard with an env var) once the permission-flow issue is resolved.
+enableFileLogging()
+console.log(`[main] file logging → ${logPath()}`)
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -102,6 +108,16 @@ ipcMain.on('perm:decide', (_, payload) => {
   }
   resolvePermission(sessionId, decision, suggestion ?? null)
   permissionController?.close()
+})
+
+// ── IPC: forward permission renderer console → main process log ──
+// permission.js (renderer) cannot write to the main-process log file
+// directly, so it ships its console output here through perm:log.
+ipcMain.on('perm:log', (_, { level, args }) => {
+  const tag = `[perm-renderer:${level}]`
+  if (level === 'error')      console.error(tag, ...(args ?? []))
+  else if (level === 'warn')  console.warn(tag,  ...(args ?? []))
+  else                        console.log(tag,   ...(args ?? []))
 })
 
 // ── IPC: renderer → main ─────────────────────────────────────
