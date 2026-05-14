@@ -100,57 +100,71 @@ Claude Code가 작업할 때 화면 위 픽셀아트 캐릭터가 실시간으�
 - 창 위치 저장 및 재시작 시 복원
 - idle 상태에서 마우스 방향으로 눈 트래킹
 
-## 설치 및 실행
+## 다운로드 & 설치
 
-**요구사항:** Node.js 18+, macOS
+**요구사항:** macOS (Apple Silicon — M1/M2/M3/M4), Node.js 18+ (훅 등록 시에만 필요)
+
+### 방법 1 · DMG 다운로드 (권장)
+
+1. [Releases 페이지](https://github.com/lilyplan/cc-monitor-pet/releases/latest)에서 **`CC Monitor Pet-0.1.0-arm64.dmg`** 다운로드
+2. dmg 더블클릭 → `CC Monitor Pet.app`을 `Applications` 폴더로 드래그
+3. **Gatekeeper 우회 (서명 안 된 앱이라 첫 실행만 필요):**
+   ```bash
+   xattr -dr com.apple.quarantine "/Applications/CC Monitor Pet.app"
+   ```
+   또는 `Applications`의 `CC Monitor Pet.app`을 **우클릭 → 열기 → 열기**로 첫 실행 (시스템 설정 → 개인 정보 및 보안에서 "확인되지 않은 개발자" 허용 클릭도 가능)
+4. `Applications` 폴더에서 더블클릭으로 실행 → 화면 좌측 하단에 펫 등장
+
+### 방법 2 · 소스에서 빌드 (개발자용)
 
 ```bash
 git clone https://github.com/lilyplan/cc-monitor-pet.git
 cd cc-monitor-pet
 npm install
-npm start
+npm start                # 개발 모드로 바로 실행
+# 또는
+npm run build:mac        # dist/ 에 dmg + .app 생성
 ```
+
+## Claude Code 훅 연결 (필수)
+
+펫이 CC 이벤트(권한 요청, 도구 실행, 컨텍스트 압축 등)에 반응하려면 한 번만 훅을 등록해야 합니다.
+
+```bash
+# 1. 저장소를 어딘가에 clone (이미 했다면 스킵)
+git clone https://github.com/lilyplan/cc-monitor-pet.git ~/Documents/cc-monitor-pet
+
+# 2. 훅 등록
+cd ~/Documents/cc-monitor-pet
+npm install
+npm run install-hooks
+```
+
+`~/.claude/settings.json`에 13개 이벤트 훅과 PermissionRequest HTTP hook이 자동 등록됩니다.
+이후 Claude Code 사용 시 캐릭터가 자동으로 반응하고, 권한 요청은 펫 머리 위 팝업으로 뜹니다.
+
+> 기존 `settings.json`은 `.bak` 파일로 백업됩니다.
+> 훅 스크립트(`hooks/hook.js`)는 clone한 폴더에서 절대 경로로 참조되므로, 이 폴더는 옮기거나 삭제하지 마세요.
 
 ## 로그인 시 자동 실행 (macOS)
 
 Mac을 켤 때 펫이 자동으로 실행되도록 설정합니다.
 
-**1. 런처 앱 생성**
+**방법 A · 시스템 설정에서 (가장 간단)**
+
+`시스템 설정 → 일반 → 로그인 항목`에서 `+`를 누르고 `/Applications/CC Monitor Pet.app`을 추가합니다.
+
+**방법 B · 터미널에서**
 
 ```bash
-mkdir -p ~/Applications
-osacompile -o ~/Applications/CCMonitorPet.app \
-  -e 'do shell script "/usr/local/bin/npm --prefix /YOUR/PATH/cc-monitor-pet start > /tmp/cc-monitor-pet.log 2>&1 &"'
+osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/CC Monitor Pet.app", hidden:true}'
 ```
-
-> `/YOUR/PATH/cc-monitor-pet`을 실제 프로젝트 경로로 변경하세요.
-
-**2. 로그인 항목 등록**
-
-```bash
-osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Users/YOUR_NAME/Applications/CCMonitorPet.app", hidden:true}'
-```
-
-또는 **시스템 설정 → 일반 → 로그인 항목**에서 `CCMonitorPet.app`을 직접 추가할 수 있습니다.
 
 **자동 실행 해제**
 
 ```bash
-osascript -e 'tell application "System Events" to delete login item "CCMonitorPet"'
+osascript -e 'tell application "System Events" to delete login item "CC Monitor Pet"'
 ```
-
-## Claude Code 훅 연결
-
-앱 실행 후 아래 명령어로 Claude Code 훅을 등록합니다.
-
-```bash
-npm run install-hooks
-```
-
-`~/.claude/settings.json`에 13개 이벤트 훅이 자동 등록됩니다.  
-이후 Claude Code 사용 시 캐릭터가 자동으로 반응합니다.
-
-> 기존 `settings.json`은 `.bak` 파일로 백업됩니다.
 
 ## MCP 서버 연결 (선택)
 
