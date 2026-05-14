@@ -36,12 +36,18 @@ export function createServer(mainWindow, {
     const heldMs = Date.now() - entry.receivedAt
     console.log(`[server] resolvePermission (session=${sessionId}, decision=${decision}, held=${heldMs}ms)`)
 
-    const body = decision === 'allow' || decision === 'always'
+    // CC 2.1+의 PermissionRequest HTTP hook 응답 스키마:
+    //   { hookEventName: "PermissionRequest",
+    //     decision: { behavior: "allow"|"deny", updatedPermissions?, message?, ... } }
+    // 이전에는 { behavior:"allow" } 단일 키만 보내서 CC가 인식하지 못하고
+    // 같은 sessionId로 요청을 반복 송신하던 문제 발생.
+    const inner = decision === 'allow' || decision === 'always'
       ? { behavior: 'allow' }
       : { behavior: 'deny', message: '사용자가 거부했습니다' }
     if (decision === 'always') {
-      body.updatedPermissions = [suggestion ?? buildFallbackSuggestion(entry.toolName, entry.toolInput)]
+      inner.updatedPermissions = [suggestion ?? buildFallbackSuggestion(entry.toolName, entry.toolInput)]
     }
+    const body = { hookEventName: 'PermissionRequest', decision: inner }
     if (decision === 'allow' || decision === 'always') {
       sendState('working', 'PermissionApproved', sessionId)
     }
