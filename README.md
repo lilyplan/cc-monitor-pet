@@ -11,6 +11,9 @@ Claude Code가 일할 때 옆에서 같이 반응해주는 **귀여운 데스크
 
 ## ⚡ 빠른 시작 (5분)
 
+> Claude Code 같은 AI agent에게 맡기실 거라면 [`INSTALL.md`](INSTALL.md)를 사용하세요.
+> Step별 bash 명령 + 검증으로 구성되어 있어서, "이 페이지대로 설치해줘"라고만 시키면 다운로드 → Gatekeeper 해제 → 훅 등록 → 결과 검증까지 자동으로 끝납니다.
+
 ### 1️⃣ 앱 다운로드 & 설치
 
 [**👉 Releases 페이지에서 dmg 다운로드**](https://github.com/lilyplan/cc-monitor-pet/releases/latest)
@@ -201,6 +204,8 @@ npm run install-hooks
 ---
 
 ## 👩‍💻 개발자용
+
+> **AI agent 친화 설치 가이드:** [`INSTALL.md`](INSTALL.md) — Step별 명령과 에러 처리 / 검증이 포함된 자동 설치 스크립트. 새 환경에 펫을 깔 때 그대로 실행하면 됩니다.
 
 ### 소스에서 빌드
 
