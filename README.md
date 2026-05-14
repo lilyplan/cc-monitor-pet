@@ -49,13 +49,22 @@ Claude Code가 작업할 때 화면 위 픽셀아트 캐릭터가 실시간으�
 
 | 버튼 | 동작 |
 |------|------|
-| 거부 | 터미널에 `n` 전송 |
-| 허용 | 터미널에 `y` 전송 |
-| 항상 허용 | prefs에 저장, 이후 자동 승인 |
+| 거부 | `behavior: deny` 응답 → CC가 도구 실행 취소 |
+| 허용 | `behavior: allow` 응답 → 이번 한 번만 |
+| 항상 허용 | `behavior: allow` + `updatedPermissions` 응답 → CC가 `~/.claude/settings.json`에 규칙 저장 |
 
-> **참고:** 터미널 자동 입력은 macOS **손쉬운 사용(Accessibility) 권한**이 필요합니다.  
-> 시스템 설정 → 개인 정보 보호 및 보안 → 손쉬운 사용에서 앱을 허용해주세요.  
-> 권한이 없으면 허용 클릭 시 설정 안내 다이얼로그가 자동으로 표시됩니다.
+> Claude Code 2.1+의 **네이티브 PermissionRequest HTTP hook**을 사용합니다.  
+> CC가 `POST /permission`으로 보낸 요청을 long-poll로 잡고, 사용자 결정을 응답 본문으로 돌려줍니다.  
+> 응답 본문 스키마는 [`src/server.js`](src/server.js) 참고:
+> ```json
+> {
+>   "hookSpecificOutput": {
+>     "hookEventName": "PermissionRequest",
+>     "decision": { "behavior": "allow" }
+>   }
+> }
+> ```
+> "항상 허용" 결정은 CC가 직접 `~/.claude/settings.json`에 규칙을 저장하므로 펫이 별도로 관리하지 않습니다.
 
 ### 상태 머신
 
@@ -192,20 +201,47 @@ cc-monitor-pet/
 ├── src/
 │   ├── main.js               # Electron 메인 프로세스, 창 관리
 │   ├── preload.cjs           # contextBridge (SVG 로딩, IPC)
-│   ├── renderer.js           # 우선순위 상태 머신 + 스프라이트 렌더링
-│   ├── server.js             # 로컬 HTTP 서버 (토큰 인증)
-│   ├── prefs.js              # 창 위치 / 항상 허용 목록 저장
-│   ├── index.html
-│   ├── permission.html       # Permission Bubble 팝업 UI
+│   ├── renderer.js           # 스프라이트 렌더링 (DOM 채널 전환)
+│   ├── state-machine.js      # 우선순위 상태 머신 + sleep 시퀀스
+│   ├── server.js             # 로컬 HTTP 서버 (/state, /permission, 토큰 인증)
+│   ├── prefs.js              # 창 위치 저장
+│   ├── permission-window.js  # Permission Bubble 창 컨트롤러
+│   ├── permission.html       # Permission Bubble UI
 │   ├── permission.js         # Permission Bubble 렌더러
-│   └── permission-preload.cjs  # Permission Bubble IPC 브릿지
-├── assets/themes/cc/sprites/   # SVG 스프라이트 15종
+│   ├── permission-preload.cjs  # Permission Bubble IPC 브릿지
+│   ├── index.html
+│   └── lib/
+│       ├── constants.js      # PET_SIZE / SERVER_PORT / TOKEN_PATH 등
+│       ├── pet-client.js     # hook.js + mcp 공통 HTTP 클라이언트
+│       └── logger.js         # 메인 콘솔 → debug.log 미러링
+├── assets/themes/cc/sprites/   # SVG 스프라이트
+├── build/
+│   ├── icon.svg / .png / .icns   # 앱 아이콘
+│   └── render-icon.cjs       # SVG → 알파 PNG 렌더 스크립트 (Electron)
 ├── hooks/
-│   ├── hook.js          # Claude Code 훅 스크립트 (stdin → POST)
+│   ├── hook.js          # Claude Code 훅 스크립트 (stdin → POST /state)
 │   └── install.js       # 훅 설치기 (Node.js 절대 경로 자동 감지)
 └── mcp/
     └── pet-server.js    # MCP 서버 (signal_pet 도구 제공)
 ```
+
+## 트러블슈팅
+
+빌드된 `.app`은 stdout이 보이지 않으므로 메인 프로세스 콘솔 출력을 파일에 미러링합니다.
+
+**디버그 로그 위치**
+
+```
+~/Library/Logs/cc-monitor-pet/debug.log
+```
+
+- 앱이 시작될 때마다 truncate (가장 최근 세션만 보존)
+- 모든 `console.log/warn/error`가 timestamp + level과 함께 기록
+- 팝업 윈도우(renderer)의 콘솔도 `perm:log` IPC를 통해 메인으로 forward되어 같은 파일에 기록
+
+**팝업 자체의 DevTools를 같이 보고 싶을 때**
+
+[`src/permission-window.js`](src/permission-window.js)의 `DEBUG_DEVTOOLS = false`를 `true`로 바꾸고 재빌드하면, 권한 팝업이 뜰 때마다 DevTools가 자동으로 함께 열립니다.
 
 ## 보안
 

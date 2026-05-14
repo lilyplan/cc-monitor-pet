@@ -11,9 +11,9 @@ const PET_VISIBLE_HEIGHT = 96
 const POPUP_GAP = 5
 const SCREEN_MARGIN = 10
 
-// TEMP: open DevTools alongside every permission popup so we can watch the
-// renderer console while diagnosing the IPC chain. Flip to false once fixed.
-const DEBUG_DEVTOOLS = true
+// Flip to true to auto-open DevTools beside the permission popup while
+// debugging the IPC / response chain. Off by default for everyday use.
+const DEBUG_DEVTOOLS = false
 
 /**
  * Manages the floating permission bubble window. Owns its own state

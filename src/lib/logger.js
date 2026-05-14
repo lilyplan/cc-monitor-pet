@@ -34,6 +34,10 @@ export function enableFileLogging() {
   if (initialized) return
   initialized = true
   try { fs.mkdirSync(LOG_DIR, { recursive: true }) } catch {}
+  // Truncate any log from the previous session so the file never grows
+  // unbounded over days/weeks. The latest session is always the only one
+  // present — which is the only useful state when debugging anyway.
+  try { fs.writeFileSync(LOG_FILE, '') } catch {}
   const orig = {
     log: console.log.bind(console),
     warn: console.warn.bind(console),
