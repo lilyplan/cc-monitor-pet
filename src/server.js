@@ -36,18 +36,28 @@ export function createServer(mainWindow, {
     const heldMs = Date.now() - entry.receivedAt
     console.log(`[server] resolvePermission (session=${sessionId}, decision=${decision}, held=${heldMs}ms)`)
 
-    // CC 2.1+의 PermissionRequest HTTP hook 응답 스키마:
-    //   { hookEventName: "PermissionRequest",
-    //     decision: { behavior: "allow"|"deny", updatedPermissions?, message?, ... } }
-    // 이전에는 { behavior:"allow" } 단일 키만 보내서 CC가 인식하지 못하고
-    // 같은 sessionId로 요청을 반복 송신하던 문제 발생.
+    // CC 2.1+ hook 응답의 outer wrapper:
+    //   { continue?, suppressOutput?, stopReason?, decision?, systemMessage?,
+    //     reason?, hookSpecificOutput?: <hook별 payload> }
+    // PermissionRequest payload는 반드시 hookSpecificOutput 안에 들어가야 함:
+    //   hookSpecificOutput: {
+    //     hookEventName: "PermissionRequest",
+    //     decision: { behavior: "allow"|"deny", updatedPermissions?, message?, ... }
+    //   }
+    // 이전 시도에서 outer wrapper(hookSpecificOutput)를 빠뜨려 CC가 응답을
+    // 인식 못 하고 같은 session으로 요청 재발송하던 문제 발생.
     const inner = decision === 'allow' || decision === 'always'
       ? { behavior: 'allow' }
       : { behavior: 'deny', message: '사용자가 거부했습니다' }
     if (decision === 'always') {
       inner.updatedPermissions = [suggestion ?? buildFallbackSuggestion(entry.toolName, entry.toolInput)]
     }
-    const body = { hookEventName: 'PermissionRequest', decision: inner }
+    const body = {
+      hookSpecificOutput: {
+        hookEventName: 'PermissionRequest',
+        decision: inner,
+      },
+    }
     if (decision === 'allow' || decision === 'always') {
       sendState('working', 'PermissionApproved', sessionId)
     }
@@ -91,7 +101,7 @@ export function createServer(mainWindow, {
         writableEnded: res.writableEnded,
         bytesWritten: after?.bytesWritten ?? null,
       }))
-      console.log(`[server] permission → ${body.behavior} (session=${sessionId}, decision=${decision})`)
+      console.log(`[server] permission → ${inner.behavior} (session=${sessionId}, decision=${decision})`)
     } catch (err) {
       console.error(`[server] 응답 송신 실패 (session=${sessionId}):`, err.message, err.stack)
     }
